@@ -1,0 +1,4 @@
+/public/.bundle/
+/dist/
+/node_modules/
+.env
