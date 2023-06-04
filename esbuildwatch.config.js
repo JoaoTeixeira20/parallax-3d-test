@@ -3,7 +3,7 @@ const esbuild = require('esbuild');
 // const path = require('path');
 const postCssPlugin = require('esbuild-style-plugin');
 const tailwindcss = require('tailwindcss');
-const autoprefixer = require('autoprefixer')
+const autoprefixer = require('autoprefixer');
 
 const esbuildPort = parseInt(process.env.ESBUILD_SERVER_PORT) || 3000;
 
