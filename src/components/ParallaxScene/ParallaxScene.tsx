@@ -25,7 +25,12 @@ const parallax = (
 const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
-const ParallaxScene = (): ReactElement => {
+type ParallaxSceneProps = {
+  gain: number
+}
+
+const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
+  const gain = (1.5 * props.gain / 2 > 1) ? 1.5 * props.gain / 2 : 1;
   const [{ x, y }, setMousePos] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -48,9 +53,16 @@ const ParallaxScene = (): ReactElement => {
       ? 'rgba(250, 204, 21,1)'
       : 'rgba(250, 204, 21,0)',
     scale: isOvering ? 1.2 : 1,
+    // scale: gain,
     boxShadow: isOvering ? '0px -6px 13px 0px rgba(238, 255, 0, 0.75), inset 0px -6px 13px 0px rgba(251, 255, 0, 0.75)'
     : '0px 0px 0px 0px rgba(238, 255, 0, 0.75), inset 0px 0px 0px 0px rgba(251, 255, 0, 0.75)',
+    outlineColor: gain,
     config: springConfig.wobbly,
+  });
+
+  const audioSpring = useSpring({
+    outlineColor: gain,
+    immediate: true,
   });
 
   useEffect(() => {
@@ -139,13 +151,21 @@ const ParallaxScene = (): ReactElement => {
         <animated.div
           onMouseOver={handleOver}
           onMouseOut={handleOverOut}
-          className='flex justify-center items-center text-xl text font-bold'
+          className='flex justify-center
+          items-center
+          text-xl
+          text
+          font-bold
+          outline
+          outline-8
+          border-none'
           style={{
-            transform: 'translateZ(100px)',
+            transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
             backgroundColor: spring.backgroundColor,
             boxShadow: spring.boxShadow,
+            outlineColor: audioSpring.outlineColor.to([0,1],['rgb(165 243 252)','rgb(22 78 99)']),
           }}
-        >hello</animated.div>
+        >hellow</animated.div>
         <div
           style={{
             transform: 'translateZ(-100px)',
