@@ -1,5 +1,5 @@
 import { animated, useSpring, config as springConfig } from '@react-spring/web';
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, ReactElement, SetStateAction, useEffect, useRef, useState } from 'react';
 
 const parallax = (
   x: number,
@@ -26,7 +26,8 @@ const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = {
-  gain: number
+  gain: number;
+  enableFilterFunc: Dispatch<SetStateAction<boolean>>
 }
 
 const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
@@ -56,7 +57,6 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
     // scale: gain,
     boxShadow: isOvering ? '0px -6px 13px 0px rgba(238, 255, 0, 0.75), inset 0px -6px 13px 0px rgba(251, 255, 0, 0.75)'
     : '0px 0px 0px 0px rgba(238, 255, 0, 0.75), inset 0px 0px 0px 0px rgba(251, 255, 0, 0.75)',
-    outlineColor: gain,
     config: springConfig.wobbly,
   });
 
@@ -107,14 +107,16 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
 
   const handleOver = () => {
     setIsOvering(true);
+    props.enableFilterFunc(false);
   };
 
   const handleOverOut = () => {
     setIsOvering(false);
+    props.enableFilterFunc(true);
   };
 
   return (
-    <div className="relative flex justify-center items-center w-96 bg-slate-800 h-96">
+    <div className="relative flex justify-center items-center w-96 h-96">
       {/* <div
         style={{
           position: 'absolute',
@@ -160,12 +162,13 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
           outline-8
           border-none'
           style={{
-            transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
+            //transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
+            transform: `translateZ(${100*gain}px)`,
             backgroundColor: spring.backgroundColor,
             boxShadow: spring.boxShadow,
-            outlineColor: audioSpring.outlineColor.to([0,1],['rgb(165 243 252)','rgb(22 78 99)']),
+            outlineColor: audioSpring.outlineColor.to([1,1.5],['rgb(165 243 252)','rgb(22 78 99)']),
           }}
-        >hellow</animated.div>
+        >hello</animated.div>
         <div
           style={{
             transform: 'translateZ(-100px)',

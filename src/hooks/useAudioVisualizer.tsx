@@ -1,17 +1,43 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+
+let animationFrameId: number;
+let audioContext: AudioContext | null = null;
+let analyser: AnalyserNode | null = null;
+let dataArray: Uint8Array | null = null;
+let source: MediaElementAudioSourceNode | null = null;
+let filter: BiquadFilterNode | null = null;
 
 const useAudioVisualizer = (
   audioRef: React.RefObject<HTMLAudioElement>,
   fftSize: number
-): number => {
+): {
+  gain: number;
+  spectrumList: number[];
+  setFilterEnabled: Dispatch<SetStateAction<boolean>>;
+} => {
   const [gain, setGain] = useState<number>(0);
+  const [spectrumList, setSpectrumList] = useState<number[]>([]);
+  const [filterEnabled, setFilterEnabled] = useState<boolean>(true);
 
   useEffect(() => {
-    let animationFrameId: number;
-    let audioContext: AudioContext | null = null;
-    let analyser: AnalyserNode | null = null;
-    let dataArray: Uint8Array | null = null;
+    if (source && filter && analyser && audioContext) {
+      source.disconnect();
+      analyser.disconnect();
+      filter.disconnect();
+      if (filterEnabled) {
+        source.connect(filter);
+        filter.connect(analyser);
+        analyser.connect(audioContext.destination);
+      } else {
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+      }
+    }
+    console.log(filterEnabled);
+    console.log(audioContext?.destination);
+  }, [filterEnabled, setFilterEnabled]);
 
+  useEffect(() => {
     const visualize = () => {
       animationFrameId = requestAnimationFrame(visualize);
 
@@ -24,6 +50,8 @@ const useAudioVisualizer = (
 
         const normalizedGain = (average - 0) / (255 - 0);
 
+        setSpectrumList(Array.from(dataArray));
+
         setGain(1 + normalizedGain);
       }
     };
@@ -34,8 +62,15 @@ const useAudioVisualizer = (
         analyser = audioContext.createAnalyser();
         analyser.fftSize = fftSize;
 
-        const source = audioContext.createMediaElementSource(audioRef.current);
-        source.connect(analyser);
+        source = audioContext.createMediaElementSource(audioRef.current);
+
+        // Create low-pass filter node
+        filter = audioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 2000; // Adjust the cutoff frequency as needed
+
+        source.connect(filter);
+        filter.connect(analyser);
         analyser.connect(audioContext.destination);
 
         dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -46,17 +81,6 @@ const useAudioVisualizer = (
 
     if (audioRef.current) {
       audioRef.current.addEventListener('play', startAudioContext);
-      audioRef.current.addEventListener('ended', () => {
-        if (audioContext) {
-          audioContext.close();
-          audioContext = null;
-        }
-        if (analyser) {
-          analyser.disconnect();
-          analyser = null;
-        }
-        dataArray = null;
-      });
     }
 
     return () => {
@@ -70,22 +94,11 @@ const useAudioVisualizer = (
 
       if (audioRef.current) {
         audioRef.current.removeEventListener('play', startAudioContext);
-        audioRef.current.removeEventListener('ended', () => {
-          if (audioContext) {
-            audioContext.close();
-            audioContext = null;
-          }
-          if (analyser) {
-            analyser.disconnect();
-            analyser = null;
-          }
-          dataArray = null;
-        });
       }
     };
   }, [audioRef, fftSize]);
 
-  return gain;
+  return { gain, spectrumList, setFilterEnabled };
 };
 
 export default useAudioVisualizer;

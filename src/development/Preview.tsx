@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import ErrorStackTrace from './ErrorStackTrace/ErrorStackTrace';
 import GlobalStyle from '@/GlobalStyles';
 import ParallaxSceneWrapper from '@/components/ParallaxSceneWrapper/ParallaxSceneWrapper';
-// import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
+import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
 
 const App = () => (
   <>
