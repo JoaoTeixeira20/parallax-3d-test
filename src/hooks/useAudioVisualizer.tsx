@@ -20,21 +20,21 @@ const useAudioVisualizer = (
   const [filterEnabled, setFilterEnabled] = useState<boolean>(true);
 
   useEffect(() => {
-    if (source && filter && analyser && audioContext) {
-      source.disconnect();
-      analyser.disconnect();
-      filter.disconnect();
+    if (filter && audioContext) {
       if (filterEnabled) {
-        source.connect(filter);
-        filter.connect(analyser);
-        analyser.connect(audioContext.destination);
-      } else {
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
+        filter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(
+          2000,
+          audioContext.currentTime + 0.3
+        );
+        return;
       }
+      filter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(
+        8000,
+        audioContext.currentTime + 0.3
+      );
     }
-    console.log(filterEnabled);
-    console.log(audioContext?.destination);
   }, [filterEnabled, setFilterEnabled]);
 
   useEffect(() => {

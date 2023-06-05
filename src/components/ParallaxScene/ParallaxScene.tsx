@@ -1,5 +1,5 @@
 import { animated, useSpring, config as springConfig } from '@react-spring/web';
-import React, { Dispatch, ReactElement, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, PropsWithChildren, ReactElement, SetStateAction, useEffect, useRef, useState } from 'react';
 
 const parallax = (
   x: number,
@@ -25,10 +25,10 @@ const parallax = (
 const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
-type ParallaxSceneProps = {
+type ParallaxSceneProps = PropsWithChildren<{
   gain: number;
   enableFilterFunc: Dispatch<SetStateAction<boolean>>
-}
+}>
 
 const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
   const gain = (1.5 * props.gain / 2 > 1) ? 1.5 * props.gain / 2 : 1;
@@ -55,8 +55,8 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
       : 'rgba(250, 204, 21,0)',
     scale: isOvering ? 1.2 : 1,
     // scale: gain,
-    boxShadow: isOvering ? '0px -6px 13px 0px rgba(238, 255, 0, 0.75), inset 0px -6px 13px 0px rgba(251, 255, 0, 0.75)'
-    : '0px 0px 0px 0px rgba(238, 255, 0, 0.75), inset 0px 0px 0px 0px rgba(251, 255, 0, 0.75)',
+    // boxShadow: isOvering ? '0px -6px 13px 0px rgba(238, 255, 0, 0.75), inset 0px -6px 13px 0px rgba(251, 255, 0, 0.75)'
+    // : '0px 0px 0px 0px rgba(238, 255, 0, 0.75), inset 0px 0px 0px 0px rgba(251, 255, 0, 0.75)',
     config: springConfig.wobbly,
   });
 
@@ -155,20 +155,22 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
           onMouseOut={handleOverOut}
           className='flex justify-center
           items-center
-          text-xl
+          text-3xl
           text
           font-bold
           outline
           outline-8
-          border-none'
+          border-none
+          text-zinc-400'
           style={{
             //transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
             transform: `translateZ(${100*gain}px)`,
             backgroundColor: spring.backgroundColor,
-            boxShadow: spring.boxShadow,
+            // boxShadow: spring.boxShadow,
             outlineColor: audioSpring.outlineColor.to([1,1.5],['rgb(165 243 252)','rgb(22 78 99)']),
+            textShadow: '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)'
           }}
-        >hello</animated.div>
+        >{props.children}</animated.div>
         <div
           style={{
             transform: 'translateZ(-100px)',
