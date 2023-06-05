@@ -24,7 +24,7 @@ const useAudioVisualizer = (
       if (filterEnabled) {
         filter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
         filter.frequency.exponentialRampToValueAtTime(
-          2000,
+          1000,
           audioContext.currentTime + 0.3
         );
         return;
@@ -67,7 +67,7 @@ const useAudioVisualizer = (
         // Create low-pass filter node
         filter = audioContext.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.value = 2000; // Adjust the cutoff frequency as needed
+        filter.frequency.value = 1000; // Adjust the cutoff frequency as needed
 
         source.connect(filter);
         filter.connect(analyser);

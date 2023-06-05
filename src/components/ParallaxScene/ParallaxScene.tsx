@@ -1,5 +1,13 @@
 import { animated, useSpring, config as springConfig } from '@react-spring/web';
-import React, { Dispatch, PropsWithChildren, ReactElement, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, {
+  Dispatch,
+  PropsWithChildren,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 const parallax = (
   x: number,
@@ -27,11 +35,11 @@ const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
   gain: number;
-  enableFilterFunc: Dispatch<SetStateAction<boolean>>
-}>
+  enableFilterFunc: Dispatch<SetStateAction<boolean>>;
+}>;
 
-const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
-  const gain = (1.5 * props.gain / 2 > 1) ? 1.5 * props.gain / 2 : 1;
+const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
+  //const gain = (1.5 * props.gain / 2 > 1) ? 1.5 * props.gain / 2 : 1;
   const [{ x, y }, setMousePos] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -51,17 +59,18 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
   const spring = useSpring({
     ...parallax(x, y, cubeX, cubeY),
     backgroundColor: isOvering
-      ? 'rgba(250, 204, 21,1)'
-      : 'rgba(250, 204, 21,0)',
-    scale: isOvering ? 1.2 : 1,
+      ? 'rgba(250, 204, 21,0.9)'
+      : 'rgba(250, 204, 21,0.1)',
+    scale: isOvering ? 1.3 : 1,
+    borderRadius: isOvering ? '1%' : '50%',
     // scale: gain,
     // boxShadow: isOvering ? '0px -6px 13px 0px rgba(238, 255, 0, 0.75), inset 0px -6px 13px 0px rgba(251, 255, 0, 0.75)'
     // : '0px 0px 0px 0px rgba(238, 255, 0, 0.75), inset 0px 0px 0px 0px rgba(251, 255, 0, 0.75)',
-    config: springConfig.wobbly,
+    config: { ...springConfig.wobbly, clamp: true },
   });
 
   const audioSpring = useSpring({
-    outlineColor: gain,
+    outlineColor: props.gain || 1,
     immediate: true,
   });
 
@@ -82,9 +91,6 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
     }
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', () => {
-      console.log('you are messing with this');
-    });
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
@@ -153,7 +159,7 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
         <animated.div
           onMouseOver={handleOver}
           onMouseOut={handleOverOut}
-          className='flex justify-center
+          className="flex justify-center
           items-center
           text-3xl
           text
@@ -161,16 +167,33 @@ const ParallaxScene = (props:ParallaxSceneProps): ReactElement => {
           outline
           outline-8
           border-none
-          text-zinc-400'
+          text-zinc-400"
           style={{
             //transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
-            transform: `translateZ(${100*gain}px)`,
+            transform: `translateZ(${80 * (props.gain || 1)}px) scale(0.85)`,
             backgroundColor: spring.backgroundColor,
             // boxShadow: spring.boxShadow,
-            outlineColor: audioSpring.outlineColor.to([1,1.5],['rgb(165 243 252)','rgb(22 78 99)']),
-            textShadow: '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)'
+            outlineColor: audioSpring.outlineColor.to(
+              [1, 2],
+              ['rgb(165 243 252)', 'rgb(22 78 99)']
+            ),
+            borderRadius: spring.borderRadius,
+
+            textShadow:
+              '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
           }}
-        >{props.children}</animated.div>
+        >
+          {props.children}
+        </animated.div>
+        <div
+          className="border-none"
+          style={{
+            transform: 'translateZ(60px)',
+            background:
+              'radial-gradient(circle, rgb(165 243 252), rgb(22 78 99))',
+            // boxShadow: '0px 0px 85px 34px rgba(0,0,0,0.76)',
+          }}
+        ></div>
         <div
           style={{
             transform: 'translateZ(-100px)',

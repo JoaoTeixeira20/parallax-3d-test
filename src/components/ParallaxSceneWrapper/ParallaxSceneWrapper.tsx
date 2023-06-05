@@ -20,8 +20,9 @@ const ParallaxSceneWrapper = (): ReactElement => {
   };
 
   return (
-    <animated.div
+    <animated.main
       onClick={playMusic}
+      className='min-w-full min-h-full flex justify-center'
       style={{
         backgroundColor: audioSpring.outlineColor.to(
           [1, 2],
@@ -29,11 +30,12 @@ const ParallaxSceneWrapper = (): ReactElement => {
         ),
       }}
     >
+      <div className='flex flex-col max-w-screen-xl justify-center items-center'>
       <div className='flex flex-row w-full justify-around'>
       <audio ref={audioRef} src="assets/intensify.mp3" controls></audio>
-      <p className='text-center p-3 text-2xl font-bold'>click anywhere</p>
+      <h1 className='text-center p-3 text-2xl font-bold'>click anywhere</h1>
       </div>
-      <div className="flex flex-row flex-wrap max-w-screen-xl">
+      <div className="flex flex-row flex-wrap justify-center">
         {items.map((el, index) => (
           <ParallaxScene
             key={index}
@@ -44,7 +46,8 @@ const ParallaxSceneWrapper = (): ReactElement => {
           </ParallaxScene>
         ))}
       </div>
-    </animated.div>
+      </div>
+    </animated.main>
   );
 };
 
