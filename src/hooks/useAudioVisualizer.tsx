@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 let animationFrameId: number;
 let audioContext: AudioContext | null = null;
@@ -37,49 +43,50 @@ const useAudioVisualizer = (
     }
   }, [filterEnabled, setFilterEnabled]);
 
+  const visualize = useCallback(() => {
+    animationFrameId = requestAnimationFrame(visualize);
+
+    if (analyser && dataArray) {
+      analyser.getByteFrequencyData(dataArray);
+
+      // Calculate the average of the bass values
+      const average =
+        dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+
+      const normalizedGain = (average - 0) / (255 - 0);
+
+      setSpectrumList(Array.from(dataArray));
+
+      setGain(1 + normalizedGain);
+    }
+  }, [setSpectrumList, setGain]);
+
+  const startAudioContext = useCallback(() => {
+    if (audioRef.current && audioContext === null) {
+      audioContext = new AudioContext();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = fftSize;
+
+      source = audioContext.createMediaElementSource(audioRef.current);
+
+      // Create low-pass filter node
+      filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 1000; // Adjust the cutoff frequency as needed
+
+      source.connect(filter);
+      filter.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      visualize();
+    }
+  }, [fftSize]);
+
   useEffect(() => {
-    const visualize = () => {
-      animationFrameId = requestAnimationFrame(visualize);
-
-      if (analyser && dataArray) {
-        analyser.getByteFrequencyData(dataArray);
-
-        // Calculate the average of the bass values
-        const average =
-          dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-
-        const normalizedGain = (average - 0) / (255 - 0);
-
-        setSpectrumList(Array.from(dataArray));
-
-        setGain(1 + normalizedGain);
-      }
-    };
-
-    const startAudioContext = () => {
-      if (audioRef.current && audioContext === null) {
-        audioContext = new AudioContext();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = fftSize;
-
-        source = audioContext.createMediaElementSource(audioRef.current);
-
-        // Create low-pass filter node
-        filter = audioContext.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 1000; // Adjust the cutoff frequency as needed
-
-        source.connect(filter);
-        filter.connect(analyser);
-        analyser.connect(audioContext.destination);
-
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        visualize();
-      }
-    };
-
     if (audioRef.current) {
+      audioRef.current.removeEventListener('play', startAudioContext);
       audioRef.current.addEventListener('play', startAudioContext);
     }
 
@@ -96,7 +103,7 @@ const useAudioVisualizer = (
         audioRef.current.removeEventListener('play', startAudioContext);
       }
     };
-  }, [audioRef, fftSize]);
+  }, [audioRef]);
 
   return { gain, spectrumList, setFilterEnabled };
 };

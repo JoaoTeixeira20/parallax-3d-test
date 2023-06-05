@@ -9,7 +9,7 @@ const App = () => (
   <>
     <GlobalStyle />
     <ErrorStackTrace>
-      <ParallaxSceneWrapper/>
+      <ParallaxSceneWrapper />
       {/* <AudioAnalyser/> */}
     </ErrorStackTrace>
   </>

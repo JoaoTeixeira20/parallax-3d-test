@@ -1,49 +1,26 @@
 import { animated, useSpring, config as springConfig } from '@react-spring/web';
 import React, {
-  Dispatch,
   PropsWithChildren,
   ReactElement,
-  SetStateAction,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-
-const parallax = (
-  x: number,
-  y: number,
-  originX: number,
-  originY: number
-): { rotateX: number; rotateY: number } => {
-  //fix for window variable access, since it's client-side we don't have immediate access to the window property
-  try {
-    const parallaxRes = [-(y - originY) / 20, (x - originX) / 20];
-    return {
-      rotateX: parallaxRes[0],
-      rotateY: parallaxRes[1],
-    };
-  } catch (error) {
-    return {
-      rotateX: 0,
-      rotateY: 0,
-    };
-  }
-};
+import { parallax } from '@/helpers/formulas';
 
 const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
   gain: number;
-  enableFilterFunc: Dispatch<SetStateAction<boolean>>;
+  mouseX: number;
+  mouseY: number;
+  onMouseOverHandler: () => void;
+  onMouseOutHandler: () => void;
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
-  //const gain = (1.5 * props.gain / 2 > 1) ? 1.5 * props.gain / 2 : 1;
-  const [{ x, y }, setMousePos] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
   const [{ cubeX, cubeY }, setCubeCoords] = useState<{
     cubeX: number;
     cubeY: number;
@@ -52,12 +29,11 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     cubeY: 0,
   });
   const [isOvering, setIsOvering] = useState<boolean>(false);
-  const scrollRef = useRef({ x: 0, y: 0 });
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
   const spring = useSpring({
-    ...parallax(x, y, cubeX, cubeY),
+    ...parallax(props.mouseX, props.mouseY, cubeX, cubeY),
     backgroundColor: isOvering
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -89,49 +65,20 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     } else {
       console.error("couldn't set origin");
     }
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
-    };
   }, []);
 
-  const handleMouseMove = (event: MouseEvent) => {
-    setMousePos({ x: event.pageX, y: event.pageY });
-  };
-
-  const handleScroll = () => {
-    const scrollX = window.scrollX - scrollRef.current.x;
-    const scrollY = window.scrollY - scrollRef.current.y;
-    setMousePos(({ x, y }) => ({
-      x: x + scrollX,
-      y: y + scrollY,
-    }));
-    scrollRef.current = { x: window.scrollX, y: window.scrollY };
-  };
-
-  const handleOver = () => {
+  const handleOver = useCallback(() => {
+    props.onMouseOverHandler();
     setIsOvering(true);
-    props.enableFilterFunc(false);
-  };
+  }, []);
 
-  const handleOverOut = () => {
+  const handleOverOut = useCallback(() => {
+    props.onMouseOutHandler();
     setIsOvering(false);
-    props.enableFilterFunc(true);
-  };
+  }, []);
 
   return (
     <div className="relative flex justify-center items-center w-96 h-96">
-      {/* <div
-        style={{
-          position: 'absolute',
-          translate: '0, 0, -200px',
-          backgroundColor: 'black',
-          width: '300px',
-          height: '300px',
-        }}
-      ></div> */}
       <animated.div
         ref={cubeRef}
         className="
