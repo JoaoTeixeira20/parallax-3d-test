@@ -1,4 +1,9 @@
-import { animated, useSpring, config as springConfig } from '@react-spring/web';
+import {
+  animated,
+  useSpring,
+  config as springConfig,
+  SpringValue,
+} from '@react-spring/web';
 import React, {
   PropsWithChildren,
   ReactElement,
@@ -13,27 +18,25 @@ const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
-  gain: number;
-  mouseX: number;
-  mouseY: number;
+  springProps: {
+    gain: SpringValue<number>;
+    spectrumList: SpringValue<any[]>;
+  };
   onMouseOverHandler: () => void;
   onMouseOutHandler: () => void;
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
-  const [{ cubeX, cubeY }, setCubeCoords] = useState<{
-    cubeX: number;
-    cubeY: number;
-  }>({
-    cubeX: 0,
-    cubeY: 0,
-  });
   const [isOvering, setIsOvering] = useState<boolean>(false);
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
+  const cubePositionRef = useRef({
+    cubeX: 0,
+    cubeY: 0,
+  })
+
   const spring = useSpring({
-    ...parallax(props.mouseX, props.mouseY, cubeX, cubeY),
     backgroundColor: isOvering
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -45,10 +48,51 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     config: { ...springConfig.wobbly, clamp: true },
   });
 
-  const audioSpring = useSpring({
-    outlineColor: props.gain || 1,
-    immediate: true,
+  const scrollRef = useRef({ x: 0, y: 0 });
+
+  const prevMouseCoords = useRef({
+    x: 0,
+    y: 0,
   });
+  const [parallaxSpring, api] = useSpring(
+    {
+      rotateX: 0,
+      rotateY: 0,
+      config: { ...springConfig.wobbly, clamp: true }
+    },
+    []
+  );
+
+  const handleMouseMove = (event: MouseEvent) => {
+    prevMouseCoords.current = { x: event.pageX, y: event.pageY };
+    const { rotateX, rotateY } = parallax(
+      event.pageX,
+      event.pageY,
+      cubePositionRef.current.cubeX,
+      cubePositionRef.current.cubeY,
+    );
+    api.start({ rotateX, rotateY });
+  };
+
+  const handleScroll = () => {
+    const scrollX = window.scrollX - scrollRef.current.x;
+    const scrollY = window.scrollY - scrollRef.current.y;
+    const { rotateX, rotateY } = parallax(
+      scrollX + prevMouseCoords.current.x,
+      scrollY + prevMouseCoords.current.y,
+      cubePositionRef.current.cubeX,
+      cubePositionRef.current.cubeY,
+    );
+    api.start({
+      rotateX,
+      rotateY,
+    });
+    prevMouseCoords.current = {
+      x: prevMouseCoords.current.x + scrollX,
+      y: prevMouseCoords.current.y + scrollY,
+    };
+    scrollRef.current = { x: window.scrollX, y: window.scrollY };
+  };
 
   useEffect(() => {
     if (cubeRef.current && window) {
@@ -58,13 +102,19 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         width,
         height,
       } = cubeRef.current?.getBoundingClientRect();
-      setCubeCoords({
+      cubePositionRef.current = {
         cubeX: left + window.scrollX + width / 2,
         cubeY: top + window.scrollY + height / 2,
-      });
+      }
     } else {
       console.error("couldn't set origin");
     }
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const handleOver = useCallback(() => {
@@ -97,8 +147,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           transformStyle: 'preserve-3d',
           // transform: 'rotateX(240deg) rotateY(-5deg) rotateZ(-155deg)',
           perspective: PERSPECTIVE,
-          rotateX: spring.rotateX,
-          rotateY: spring.rotateY,
+          rotateX: parallaxSpring.rotateX,
+          rotateY: parallaxSpring.rotateY,
           translate3d: ['0%', '0%', DISTANCE],
           scale: spring.scale,
         }}
@@ -117,10 +167,16 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           text-zinc-400"
           style={{
             //transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
-            transform: `translateZ(${80 * (props.gain || 1)}px) scale(0.85)`,
+            // transform: `translateZ(${props.springProps.gain.to(
+            //   [1, 2],
+            //   [80, 120]
+            // )}px) scale(0.85)`,
+            translateZ: props.springProps.gain.to([1, 2], [80, 120]),
+            scale: 0.85,
+            // transform: `translateZ(${props.springProps.gain.to([1,2],[80,120])}}px)`,
             backgroundColor: spring.backgroundColor,
             // boxShadow: spring.boxShadow,
-            outlineColor: audioSpring.outlineColor.to(
+            outlineColor: props.springProps.gain.to(
               [1, 2],
               ['rgb(165 243 252)', 'rgb(22 78 99)']
             ),
