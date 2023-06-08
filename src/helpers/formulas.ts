@@ -18,3 +18,22 @@ export const parallax = (
     };
   }
 };
+
+export const debounce = <T extends (...args: any[]) => void>(
+  f: T,
+  delay: number
+) => {
+  let timer: NodeJS.Timeout | null = null;
+  return function (this: any, ...args: Parameters<T>) {
+    clearTimeout(timer!);
+    timer = setTimeout(() => f.apply(this, args), delay);
+  };
+};
+
+export const asyncGetBoundingClientRect = (
+  element: Element
+): Promise<DOMRect> => {
+  return new Promise((res) => {
+    res(element.getBoundingClientRect());
+  });
+};

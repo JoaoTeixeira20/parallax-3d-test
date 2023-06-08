@@ -1,18 +1,20 @@
-import * as React from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import ErrorStackTrace from './ErrorStackTrace/ErrorStackTrace';
-import GlobalStyle from '@/GlobalStyles';
-import ParallaxSceneWrapper from '@/components/ParallaxSceneWrapper/ParallaxSceneWrapper';
-import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
+import { PagesContextProvider } from '@/context/PagesContext';
+import Root from '@/routes/Root';
+import { BrowserRouter } from 'react-router-dom';
 
 const App = () => (
-  <>
-    <GlobalStyle />
+  <div className='min-w-full min-h-screen flex'>
     <ErrorStackTrace>
-      <ParallaxSceneWrapper />
-      {/* <AudioAnalyser/> */}
+      <PagesContextProvider>
+        <BrowserRouter>
+          <Root />
+        </BrowserRouter>
+      </PagesContextProvider>
     </ErrorStackTrace>
-  </>
+  </div>
 );
 
 const root = ReactDOM.createRoot(

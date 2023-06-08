@@ -1,0 +1,1 @@
+export const items = ['sound', 'spectrum', 'analyzer', 'boxes', 'mouse', 'parallax'];

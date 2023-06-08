@@ -1,7 +1,8 @@
-import { animated, useSpring, config as springConfig } from '@react-spring/web';
+import { animated, useSpring, config as springConfig, SpringValue } from '@react-spring/web';
 import React, {
   PropsWithChildren,
   ReactElement,
+  SyntheticEvent,
   useCallback,
   useEffect,
   useRef,
@@ -13,11 +14,16 @@ const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
-  gain: number;
+  springRef: {
+    gain: SpringValue<number>;
+    spectrumList: SpringValue<any[]>;
+  };
   mouseX: number;
   mouseY: number;
   onMouseOverHandler: () => void;
   onMouseOutHandler: () => void;
+  onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
+  routerIndex: number;
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
@@ -39,18 +45,11 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
       : 'rgba(250, 204, 21,0.1)',
     scale: isOvering ? 1.3 : 1,
     borderRadius: isOvering ? '1%' : '50%',
-    // scale: gain,
-    // boxShadow: isOvering ? '0px -6px 13px 0px rgba(238, 255, 0, 0.75), inset 0px -6px 13px 0px rgba(251, 255, 0, 0.75)'
-    // : '0px 0px 0px 0px rgba(238, 255, 0, 0.75), inset 0px 0px 0px 0px rgba(251, 255, 0, 0.75)',
     config: { ...springConfig.wobbly, clamp: true },
   });
 
-  const audioSpring = useSpring({
-    outlineColor: props.gain || 1,
-    immediate: true,
-  });
-
   useEffect(() => {
+    setTimeout(() => {
     if (cubeRef.current && window) {
       const {
         x: left,
@@ -65,6 +64,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     } else {
       console.error("couldn't set origin");
     }
+  },200);
   }, []);
 
   const handleOver = useCallback(() => {
@@ -75,6 +75,10 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   const handleOverOut = useCallback(() => {
     props.onMouseOutHandler();
     setIsOvering(false);
+  }, []);
+
+  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
+    props.onClickHandler(event);
   }, []);
 
   return (
@@ -95,7 +99,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           width: '200px',
           height: '200px',
           transformStyle: 'preserve-3d',
-          // transform: 'rotateX(240deg) rotateY(-5deg) rotateZ(-155deg)',
           perspective: PERSPECTIVE,
           rotateX: spring.rotateX,
           rotateY: spring.rotateY,
@@ -106,6 +109,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         <animated.div
           onMouseOver={handleOver}
           onMouseOut={handleOverOut}
+          onClick={handleClick}
           className="flex justify-center
           items-center
           text-3xl
@@ -114,13 +118,14 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           outline
           outline-8
           border-none
-          text-zinc-400"
+          text-zinc-400
+          cursor-pointer
+          select-none"
           style={{
-            //transform: isOvering ? 'translateZ(100px)' : `translateZ(${100*gain}px)`,
-            transform: `translateZ(${80 * (props.gain || 1)}px) scale(0.85)`,
+            translateZ: props.springRef.gain.to([1, 2], [80, 120]),
+            scale: 0.85,
             backgroundColor: spring.backgroundColor,
-            // boxShadow: spring.boxShadow,
-            outlineColor: audioSpring.outlineColor.to(
+            outlineColor: props.springRef.gain.to(
               [1, 2],
               ['rgb(165 243 252)', 'rgb(22 78 99)']
             ),
@@ -138,13 +143,11 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
             transform: 'translateZ(60px)',
             background:
               'radial-gradient(circle, rgb(165 243 252), rgb(22 78 99))',
-            // boxShadow: '0px 0px 85px 34px rgba(0,0,0,0.76)',
           }}
         ></div>
         <div
           style={{
             transform: 'translateZ(-100px)',
-            // boxShadow: '0px 0px 85px 34px rgba(0,0,0,0.76)',
           }}
         ></div>
         <div
