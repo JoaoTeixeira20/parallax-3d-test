@@ -1,13 +1,13 @@
 import React, { ReactElement } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import CardContent from '../CardContent/CardContent';
 
 const CardContentRenderer = (): ReactElement => {
+  const params = useParams();
 
-    const params = useParams();
+  return (
+      <CardContent index={Number(params['id'])} />
+  );
+};
 
-    return (<div><div>hello renderer {params['id']}</div>
-        <Link to="/">go back</Link>
-    </div>)
-}
-
-export default CardContentRenderer
+export default CardContentRenderer;

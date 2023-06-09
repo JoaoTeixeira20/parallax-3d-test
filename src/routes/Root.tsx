@@ -1,5 +1,6 @@
 import CardContentRenderer from '@/components/CardContentRenderer/CardContentRenderer';
 import Main from '@/components/Main/Main';
+import MenuWrapper from '@/components/MenuWrapper/MenuWrapper';
 import ParallaxSceneWrapper from '@/components/ParallaxSceneWrapper/ParallaxSceneWrapper';
 import { animated, useTransition } from '@react-spring/web';
 import React, { ReactElement, useEffect } from 'react';
@@ -14,25 +15,43 @@ const Root = (): ReactElement => {
   }, [location]);
 
   const transitions = useTransition(location, {
-    // from: { transform: 'translate3d(100%,0,0)' },
-    // enter: { transform: 'translate3d(0%,0,0)' },
-    // leave: { transform: 'translate3d(-50%,0,0)' },
-    from: { opacity: 0, bottom: "-100%", position: 'absolute', scale: 0 },
-    enter: { opacity: 1, bottom:"0%", position: 'relative', scale: 1 },
-    leave: { opacity: 0, bottom: "100%", position: 'absolute', scale: 0 },
+    from: {
+      transform: 'translate3d(0,-100%,0)',
+      position: 'absolute',
+      scale:0,
+      opacity: 0,
+    },
+    enter: {
+      transform: 'translate3d(0,0%,0)',
+      position: 'relative',
+      scale:1,
+      opacity: 1,
+    },
+    leave: {
+      transform: 'translate3d(0,-100%,0)',
+      position: 'absolute',
+      scale:0,
+      opacity: 0,
+    },
+    // from: { opacity: 0, top: "-100%", position: 'absolute', scale: 0 },
+    // enter: { opacity: 1, top:"0%", position: 'relative', scale: 1 },
+    // leave: { opacity: 0, top: "100%", position: 'absolute', scale: 0 },
+    config: {mass:1, tension: 130, friction:17, clamp: true}
   });
 
   return (
     <Main>
-        <div className='overflow-hidden relative'>
-      {transitions((styles, item) => (
-        <animated.div style={{ ...styles }}>
-          <Routes location={item}>
-            <Route path="/" Component={ParallaxSceneWrapper} />
-            <Route path="/cards/:id" Component={CardContentRenderer} />
-          </Routes>
-        </animated.div>
-      ))}
+      <div className="overflow-hidden relative">
+        {transitions((styles, item) => (
+          //@ts-expect-error
+          <animated.div style={{ ...styles }}>
+            <Routes location={item}>
+              <Route path="/" Component={MenuWrapper} />
+              <Route path="/:id" Component={MenuWrapper} />
+              <Route path="/cards/:id" Component={CardContentRenderer} />
+            </Routes>
+          </animated.div>
+        ))}
       </div>
     </Main>
   );

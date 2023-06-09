@@ -1,10 +1,16 @@
-import { animated, useSpring, config as springConfig, SpringValue } from '@react-spring/web';
+import {
+  animated,
+  useSpring,
+  config as springConfig,
+  SpringValue,
+} from '@react-spring/web';
 import React, {
   PropsWithChildren,
   ReactElement,
   SyntheticEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -14,32 +20,53 @@ const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
+  snapScroll?: boolean;
   springRef: {
     gain: SpringValue<number>;
     spectrumList: SpringValue<any[]>;
   };
   mouseX: number;
   mouseY: number;
-  onMouseOverHandler: () => void;
-  onMouseOutHandler: () => void;
+  cubeSize: number;
+  onMouseOverHandler?: () => void;
+  onMouseOutHandler?: () => void;
   onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
-  routerIndex: number;
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
-  const [{ cubeX, cubeY }, setCubeCoords] = useState<{
-    cubeX: number;
-    cubeY: number;
-  }>({
-    cubeX: 0,
-    cubeY: 0,
-  });
+  const cubeProps = useMemo(
+    () => ({
+      containerSize: props.cubeSize * 1.8,
+      originalSize: props.cubeSize,
+      translateZSize: props.cubeSize / 2,
+      springGainInterpolationSize: {
+        start: (props.cubeSize / 2) * 0.8,
+        end: (props.cubeSize / 2) * 1.2,
+      },
+      textSize: props.cubeSize * 0.15,
+      ringContainerDistance: (props.cubeSize / 2) * 0.6,
+      outLineRingWidth: props.cubeSize * 0.05,
+    }),
+    [props.cubeSize]
+  );
+  const [{ cubeLeft, cubeTop, centerCubeX, centerCubeY }, setCubeCoords] =
+    useState<{
+      cubeLeft: number;
+      cubeTop: number;
+      centerCubeX: number;
+      centerCubeY: number;
+    }>({
+      cubeLeft: 0,
+      cubeTop: 0,
+      centerCubeX: 0,
+      centerCubeY: 0,
+    });
   const [isOvering, setIsOvering] = useState<boolean>(false);
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
   const spring = useSpring({
-    ...parallax(props.mouseX, props.mouseY, cubeX, cubeY),
+    ...parallax(props.mouseX, props.mouseY, centerCubeX, centerCubeY),
     backgroundColor: isOvering
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -50,39 +77,60 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
 
   useEffect(() => {
     setTimeout(() => {
-    if (cubeRef.current && window) {
-      const {
-        x: left,
-        y: top,
-        width,
-        height,
-      } = cubeRef.current?.getBoundingClientRect();
-      setCubeCoords({
-        cubeX: left + window.scrollX + width / 2,
-        cubeY: top + window.scrollY + height / 2,
-      });
-    } else {
-      console.error("couldn't set origin");
-    }
-  },200);
+      if (cubeRef.current && window) {
+        const {
+          x: left,
+          y: top,
+          width,
+          height,
+        } = cubeRef.current?.getBoundingClientRect();
+        setCubeCoords({
+          cubeLeft: left,
+          cubeTop: top,
+          centerCubeX: left + window.scrollX + width / 2,
+          centerCubeY: top + window.scrollY + height / 2,
+        });
+      } else {
+        console.error("couldn't set origin");
+      }
+    }, 300);
   }, []);
 
+  useEffect(() => {
+    if (props.snapScroll === true) {
+      window.scrollTo(0, centerCubeY - window.innerHeight / 2);
+      setIsOvering(true);  
+      return
+    }
+    setIsOvering(false);
+  }, [props.snapScroll, centerCubeY]);
+
   const handleOver = useCallback(() => {
-    props.onMouseOverHandler();
+    props.onMouseOverHandler && props.onMouseOverHandler();
     setIsOvering(true);
   }, []);
 
   const handleOverOut = useCallback(() => {
-    props.onMouseOutHandler();
+    props.onMouseOutHandler && props.onMouseOutHandler();
     setIsOvering(false);
   }, []);
 
-  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
-    props.onClickHandler(event);
-  }, []);
+  const handleClick = useCallback(
+    (event: SyntheticEvent<HTMLElement>) => {
+      // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
+      props.onClickHandler(event);
+    },
+    [centerCubeY]
+  );
 
   return (
-    <div className="relative flex justify-center items-center w-96 h-96">
+    <div
+      className="relative flex justify-center items-center"
+      style={{
+        width: cubeProps.containerSize,
+        height: cubeProps.containerSize,
+      }}
+    >
       <animated.div
         ref={cubeRef}
         className="
@@ -96,8 +144,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         [&>div]:rounded-md
         [&>div]:bg-cyan-900"
         style={{
-          width: '200px',
-          height: '200px',
+          width: `${cubeProps.originalSize}px`,
+          height: `${cubeProps.originalSize}px`,
           transformStyle: 'preserve-3d',
           perspective: PERSPECTIVE,
           rotateX: spring.rotateX,
@@ -112,19 +160,25 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           onClick={handleClick}
           className="flex justify-center
           items-center
-          text-3xl
           text
           font-bold
           outline
-          outline-8
           border-none
           text-zinc-400
           cursor-pointer
           select-none"
           style={{
-            translateZ: props.springRef.gain.to([1, 2], [80, 120]),
+            translateZ: props.springRef.gain.to(
+              [1, 2],
+              [
+                cubeProps.springGainInterpolationSize.start,
+                cubeProps.springGainInterpolationSize.end,
+              ]
+            ),
             scale: 0.85,
+            fontSize: cubeProps.textSize,
             backgroundColor: spring.backgroundColor,
+            outlineWidth: cubeProps.outLineRingWidth,
             outlineColor: props.springRef.gain.to(
               [1, 2],
               ['rgb(165 243 252)', 'rgb(22 78 99)']
@@ -140,34 +194,34 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         <div
           className="border-none"
           style={{
-            transform: 'translateZ(60px)',
+            transform: `translateZ(${cubeProps.ringContainerDistance}px)`,
             background:
               'radial-gradient(circle, rgb(165 243 252), rgb(22 78 99))',
           }}
         ></div>
         <div
           style={{
-            transform: 'translateZ(-100px)',
+            transform: `translateZ(-${cubeProps.translateZSize}px)`,
           }}
         ></div>
         <div
           style={{
-            transform: 'rotateY(90deg) translateZ(100px)',
+            transform: `rotateY(90deg) translateZ(${cubeProps.translateZSize}px)`,
           }}
         ></div>
         <div
           style={{
-            transform: 'rotateY(-90deg) translateZ(100px)',
+            transform: `rotateY(-90deg) translateZ(${cubeProps.translateZSize}px)`,
           }}
         ></div>
         <div
           style={{
-            transform: 'rotateX(90deg) translateZ(100px)',
+            transform: `rotateX(90deg) translateZ(${cubeProps.translateZSize}px)`,
           }}
         ></div>
         <div
           style={{
-            transform: 'rotateX(-90deg) translateZ(100px)',
+            transform: `rotateX(-90deg) translateZ(${cubeProps.translateZSize}px)`,
           }}
         ></div>
       </animated.div>

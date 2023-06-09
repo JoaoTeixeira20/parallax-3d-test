@@ -1,13 +1,17 @@
 import useAudioVisualizer from '@/hooks/useAudioVisualizer';
-import React, { ReactElement, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 
 const AudioAnalyser = (): ReactElement => {
   const audioRef = useRef(null);
-  const { gain, spectrumList } = useAudioVisualizer(audioRef, 64);
+  const { gain, spectrumList, setFilterEnabled } = useAudioVisualizer(audioRef, 64);
+
+  useEffect(() => {
+    setFilterEnabled(true);
+  },[]);
 
   return (
     <div className="flex flex-row flex-wrap">
-      <audio ref={audioRef} src="intensify.mp3" controls></audio>
+      <audio ref={audioRef} src="assets/intensify.mp3" controls></audio>
       <div className="flex flex-row items-end" style={{ height: 250 }}>
         {spectrumList &&
           spectrumList?.map((el, index) => {
