@@ -69,7 +69,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     ...parallax(props.mouseX, props.mouseY, centerCubeX, centerCubeY),
     backgroundColor: isOvering
       ? 'rgba(250, 204, 21,0.9)'
-      : 'rgba(250, 204, 21,0.1)',
+      : 'rgba(250, 204, 21,0.2)',
     scale: isOvering ? 1.3 : 1,
     borderRadius: isOvering ? '1%' : '50%',
     config: { ...springConfig.wobbly, clamp: true },
@@ -99,8 +99,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   useEffect(() => {
     if (props.snapScroll === true) {
       window.scrollTo(0, centerCubeY - window.innerHeight / 2);
-      setIsOvering(true);  
-      return
+      setIsOvering(true);
+      return;
     }
     setIsOvering(false);
   }, [props.snapScroll, centerCubeY]);

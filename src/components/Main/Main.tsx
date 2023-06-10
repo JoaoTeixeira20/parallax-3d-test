@@ -9,7 +9,7 @@ const Main = (props: PropsWithChildren) => {
   return (
     <animated.main
       //   onClick={playMusic}
-      className="relative min-w-full flex justify-center"
+      className="relative min-h-screen w-screen flex justify-center"
       style={{
         backgroundColor: spring.gain.to(
           [1, 2],
@@ -17,7 +17,7 @@ const Main = (props: PropsWithChildren) => {
         ),
       }}
     >
-      <div className="relative flex flex-col w-screen-xl max-w-screen-xl min-h-full justify-start items-center">
+      <div className="relative flex flex-col justify-start items-center container">
         <h1 className="relative text-center p-3 text-2xl font-bold">
           click anywhere
         </h1>

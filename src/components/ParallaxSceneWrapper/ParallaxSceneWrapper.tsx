@@ -54,14 +54,12 @@ const ParallaxSceneWrapper = (
       pointer: {
         touch: true,
       },
-      preventDefault: true,
     }
   );
   const {
     spring,
     focusPos,
     setFilterEnabled,
-    setMainContainerSize,
     isMobileRef,
   } = useContext(PagesContext);
   const navigate = useNavigate();
@@ -75,14 +73,6 @@ const ParallaxSceneWrapper = (
 
   const handleClickEvent = useCallback((index: number) => {
     navigate(`/cards/${index}`);
-  }, []);
-
-  useEffect(() => {
-    containerRef.current &&
-      setMainContainerSize({
-        width: containerRef.current?.clientWidth,
-        height: containerRef.current?.clientHeight,
-      });
   }, []);
 
   return (

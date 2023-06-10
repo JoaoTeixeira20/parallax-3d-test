@@ -41,7 +41,7 @@ const Root = (): ReactElement => {
 
   return (
     <Main>
-      <div className="overflow-hidden relative">
+      <div className="relative container">
         {transitions((styles, item) => (
           //@ts-expect-error
           <animated.div style={{ ...styles }}>

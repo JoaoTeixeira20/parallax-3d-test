@@ -23,10 +23,6 @@ type PagesContextProps = {
   handleMouseOverEvent: () => void;
   handleMouseOutEvent: () => void;
   setFilterEnabled: (state: boolean) => void;
-  mainContainerSize: { width: number; height: number };
-  setMainContainerSize: Dispatch<
-    SetStateAction<{ width: number; height: number }>
-  >;
   isMobileRef: MutableRefObject<boolean>;
   scrollRef: MutableRefObject<{ x: number; y: number }>;
 };
@@ -45,13 +41,6 @@ const PagesContextProvider = (
   const [focusPos, setFocusPos] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
-  });
-  const [mainContainerSize, setMainContainerSize] = useState<{
-    width: number;
-    height: number;
-  }>({
-    height: 0,
-    width: 0,
   });
 
   const handleMouseMove = useCallback((event: MouseEvent) => {
@@ -121,8 +110,6 @@ const PagesContextProvider = (
         handleMouseOverEvent,
         handleMouseOutEvent,
         setFilterEnabled,
-        mainContainerSize,
-        setMainContainerSize,
         isMobileRef,
         scrollRef,
       }}
