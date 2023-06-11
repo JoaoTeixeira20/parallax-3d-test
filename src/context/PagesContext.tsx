@@ -79,7 +79,8 @@ const PagesContextProvider = (
       setFilterEnabled(true);
       console.log("it's not a touchscreen");
     }
-    changeAudio('/assets/intensify.mp3');
+    // @TODO: check this later
+    changeAudio(`${window.location.href}assets/intensify.mp3`);
     window.addEventListener('mousemove', handleMouseMove);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
