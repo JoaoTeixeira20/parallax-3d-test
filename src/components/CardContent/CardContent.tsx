@@ -9,11 +9,11 @@ type CardContentProps = {
 
 const CardContent = (props: CardContentProps): ReactElement => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { focusPos, spring } = useContext(PagesContext);
+  const { focusPos, spring, setFilterEnabled } = useContext(PagesContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/#index${props.index}`);
+    navigate(`/?id=${props.index}`);
   };
 
   // useEffect(() => {

@@ -2,14 +2,18 @@ export const parallax = (
   x: number,
   y: number,
   originX: number,
-  originY: number
+  originY: number,
+  maxAngleDeg: number, 
 ): { rotateX: number; rotateY: number } => {
   //fix for window variable access, since it's client-side we don't have immediate access to the window property
   try {
-    const parallaxRes = [-(y - originY) / 20, (x - originX) / 20];
+    const parallaxRes = {
+      rotateX: -(y - originY) / 20,
+      rotateY: (x - originX) / 20,
+    }
     return {
-      rotateX: parallaxRes[0],
-      rotateY: parallaxRes[1],
+      rotateX: Math.max(Math.min(parallaxRes.rotateX, maxAngleDeg),-maxAngleDeg),
+      rotateY: Math.max(Math.min(parallaxRes.rotateY, maxAngleDeg),-maxAngleDeg),
     };
   } catch (error) {
     return {
