@@ -16,12 +16,12 @@ const CardContent = (props: CardContentProps): ReactElement => {
     navigate(`/?id=${props.index}`);
   };
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     containerRef.current &&
-  //       containerRef.current?.scrollIntoView({ behavior: 'smooth' });
-  //   }, 200);
-  // }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      containerRef.current &&
+        containerRef.current?.scrollIntoView({ block: 'start' });
+    }, 200);
+  }, []);
 
   return (
     <div ref={containerRef} className="container block relative">

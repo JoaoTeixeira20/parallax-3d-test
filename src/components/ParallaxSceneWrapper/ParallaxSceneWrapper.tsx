@@ -21,7 +21,6 @@ const ParallaxSceneWrapper = (
 ): ReactElement => {
   const { spring, focusPos, setFilterEnabled, isMobileRef } =
     useContext(PagesContext);
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const [activeContainer, setActiveContainer] = useState<boolean[]>(
     items.map((_, index) =>
       props.index === index && isMobileRef.current
@@ -83,7 +82,6 @@ const ParallaxSceneWrapper = (
         <div style={{ height: (200 * 1.8) / 2, width: 200 * 1.8 }}></div>
       )}
       <div
-        ref={containerRef}
         className="flex flex-row flex-wrap justify-center max-w-screen-xl"
         style={{ touchAction: 'none' }}
         {...bind()}

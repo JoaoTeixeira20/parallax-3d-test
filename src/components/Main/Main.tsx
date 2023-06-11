@@ -9,11 +9,11 @@ const Main = (props: PropsWithChildren) => {
   return (
     <animated.main
       //   onClick={playMusic}
-      className="relative min-h-screen w-screen flex justify-center"
+      className="relative h-screen w-screen flex justify-center"
       style={{
         backgroundColor: spring.trebleGain.to(
           [0, 1],
-          ['rgb(100 116 139', 'rgb(30 41 59']
+          ['rgb(100 116 139)', 'rgb(30 41 59)']
         ),
       }}
     >
@@ -21,7 +21,9 @@ const Main = (props: PropsWithChildren) => {
         <h1 className="relative text-center p-3 text-2xl font-bold">
           click anywhere
         </h1>
+        <div className='overflow-y-auto container'>
           {props.children}
+          </div>
       </div>
     </animated.main>
   );

@@ -15,6 +15,7 @@ import React, {
   useState,
 } from 'react';
 import { parallax } from '@/helpers/formulas';
+import useMeasure from '@/hooks/useMeasure';
 
 const DISTANCE = 0;
 const PERSPECTIVE = 600;
@@ -49,20 +50,19 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     }),
     [props.cubeSize]
   );
-  const [{ centerCubeX, centerCubeY }, setCubeCoords] =
-    useState<{
-      centerCubeX: number;
-      centerCubeY: number;
-    }>({
-      centerCubeX: 0,
-      centerCubeY: 0,
-    });
+  const [ref, bounds] = useMeasure({ scroll: true, debounce: 10 });
   const [isActive, setIsActive] = useState<boolean | undefined>(props.active);
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
   const spring = useSpring({
-    ...parallax(props.mouseX, props.mouseY, centerCubeX, centerCubeY, 45),
+    ...parallax(
+      props.mouseX,
+      props.mouseY,
+      bounds.left + bounds.width / 2,
+      bounds.top + bounds.height / 2,
+      45
+    ),
     backgroundColor: isActive
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -73,31 +73,17 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (cubeRef.current && window) {
-        const {
-          x: left,
-          y: top,
-          width,
-          height,
-        } = cubeRef.current?.getBoundingClientRect();
-        setCubeCoords({
-          centerCubeX: left + window.scrollX + width / 2,
-          centerCubeY: top + window.scrollY + height / 2,
-        });
-      } else {
-        console.error("couldn't set origin");
+      if (props.active === true) {
+        // window.scrollTo(0, centerCubeY - window.innerHeight / 2);
+        cubeRef.current?.scrollIntoView({ block: 'center' });
+        setIsActive(true);
+        return;
       }
+      setIsActive(false);
+      // triggering an event so useMeasure has time to react to the change
+      window.dispatchEvent(new Event('resize'));
     }, 300);
-  }, []);
-
-  useEffect(() => {
-    if (props.active === true) {
-      window.scrollTo(0, centerCubeY - window.innerHeight / 2);
-      setIsActive(true);
-      return;
-    }
-    setIsActive(false);
-  }, [props.active, centerCubeY]);
+  }, [props.active]);
 
   const handleOver = useCallback(() => {
     props.onMouseOverHandler && props.onMouseOverHandler();
@@ -109,22 +95,28 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     setIsActive(false);
   }, []);
 
-  const handleClick = useCallback(
-    (event: SyntheticEvent<HTMLElement>) => {
-      // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
-      props.onClickHandler(event);
-    },
-    [centerCubeY]
-  );
+  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
+    // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
+    props.onClickHandler(event);
+  }, []);
 
   return (
     <div
+      ref={ref}
       className="relative flex justify-center items-center"
       style={{
         width: cubeProps.containerSize,
         height: cubeProps.containerSize,
       }}
     >
+      {/* <div className='absolute z-10 pointer-events-none'>
+        {Object.keys(bounds).map((key) => (
+          <div key={key}>
+            <span>{key}</span>
+            <span>{bounds[key]}</span>
+          </div>
+        ))}
+      </div> */}
       <animated.div
         ref={cubeRef}
         className="

@@ -1,10 +1,8 @@
 import useSpringAudioSpectrum from '@/hooks/useSpringAudioSpectrum';
 import { SpringValue } from '@react-spring/web';
 import React, {
-  Dispatch,
   MutableRefObject,
   PropsWithChildren,
-  SetStateAction,
   createContext,
   useCallback,
   useEffect,
@@ -48,16 +46,6 @@ const PagesContextProvider = (
     setFocusPos({ x: event.pageX, y: event.pageY });
   }, []);
 
-  const handleScroll = useCallback(() => {
-    const scrollX = window.scrollX - scrollRef.current.x;
-    const scrollY = window.scrollY - scrollRef.current.y;
-    setFocusPos(({ x, y }) => ({
-      x: x + scrollX,
-      y: y + scrollY,
-    }));
-    scrollRef.current = { x: window.scrollX, y: window.scrollY };
-  }, []);
-
   const changeAudio = (url: string) => {
     fetch(url)
       .then((response) => response.blob())
@@ -93,10 +81,8 @@ const PagesContextProvider = (
     }
     changeAudio('/assets/intensify.mp3');
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
