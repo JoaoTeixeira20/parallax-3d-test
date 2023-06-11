@@ -79,7 +79,12 @@ const PagesContextProvider = (
       setFilterEnabled(true);
       console.log("it's not a touchscreen");
     }
-    changeAudio(`${window.location.origin}${window.location.pathname}assets/intensify.mp3`);
+    // changeAudio(`${window.location.origin}${window.location.pathname}assets/intensify.mp3`);
+    if(audioRef.current){
+      audioRef.current.src = "/assets/intensify.mp3";
+      audioRef.current.load();
+    } 
+
     window.addEventListener('mousemove', handleMouseMove);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
