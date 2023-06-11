@@ -81,7 +81,7 @@ const PagesContextProvider = (
     }
     // changeAudio(`${window.location.origin}${window.location.pathname}assets/intensify.mp3`);
     if(audioRef.current){
-      audioRef.current.src = "/assets/intensify.mp3";
+      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/intensify.mp3`;
       audioRef.current.load();
     } 
 
