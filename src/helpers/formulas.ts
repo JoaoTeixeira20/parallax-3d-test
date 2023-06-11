@@ -19,6 +19,19 @@ export const parallax = (
   }
 };
 
+export const rangeConversion = (
+  value: number,
+  originMinValue: number,
+  originMaxValue: number,
+  destinationMinValue: number,
+  destinationMaxValue: number
+): number => {
+  const originValue = (originMaxValue - originMinValue)  
+  const destinationValue = (destinationMaxValue - destinationMinValue)  
+  const calculation = (((value - originMinValue) * destinationValue) / originValue) + destinationMinValue
+  return Math.max(Math.min(calculation, destinationMaxValue), destinationMinValue);
+};
+
 export const debounce = <T extends (...args: any[]) => void>(
   f: T,
   delay: number

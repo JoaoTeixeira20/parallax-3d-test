@@ -9,11 +9,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 const Root = (): ReactElement => {
   const location = useLocation();
 
-  useEffect(() => {
-    console.log('changed location to ', location.pathname);
-    console.log(JSON.stringify(location));
-  }, [location]);
-
   const transitions = useTransition(location, {
     from: {
       transform: 'translate3d(0,-100%,0)',

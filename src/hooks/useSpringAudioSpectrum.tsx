@@ -1,12 +1,16 @@
+import { rangeConversion } from '@/helpers/formulas';
 import { SpringValue, useSpring } from '@react-spring/web';
 import { useCallback, useEffect } from 'react';
 
 let animationFrameId: number;
 let audioContext: AudioContext = new AudioContext();
-let analyser: AnalyserNode | null = null;
-let dataArray: Uint8Array | null = null;
 let source: MediaElementAudioSourceNode | null = null;
-let filter: BiquadFilterNode | null = null;
+let bassDataArray: Uint8Array | null = null;
+let trebleDataArray: Uint8Array | null = null;
+let bassAnalyser: AnalyserNode | null = null;
+let trebleAnalyser: AnalyserNode | null = null;
+let bassFilter: BiquadFilterNode | null = null;
+let trebleFilter: BiquadFilterNode | null = null;
 
 const useSpringAudioSpectrum = (
   audioRef: React.RefObject<HTMLAudioElement>,
@@ -14,52 +18,59 @@ const useSpringAudioSpectrum = (
 ): {
   setFilterEnabled: (state: boolean) => void;
   spring: {
-    gain: SpringValue<number>;
-    spectrumList: SpringValue<any[]>;
+    bassGain: SpringValue<number>;
+    trebleGain: SpringValue<number>;
   };
 } => {
   const [spring, api] = useSpring(
     {
-      gain: 1,
-      spectrumList: new Array().fill(fftSize),
+      bassGain: 0,
+      trebleGain: 0,
       immediate: true,
     },
     []
   );
 
   const setFilterEnabled = (state: boolean) => {
-    if (filter && audioContext) {
-      if (state) {
-        filter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(
-          1000,
-          audioContext.currentTime + 0.3
-        );
-        return;
-      }
-      filter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
-      filter.frequency.exponentialRampToValueAtTime(
-        8000,
-        audioContext.currentTime + 0.3
-      );
-    }
+    // if (bassFilter && audioContext) {
+    //   if (state) {
+    //     bassFilter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+    //     bassFilter.frequency.exponentialRampToValueAtTime(
+    //       1000,
+    //       audioContext.currentTime + 0.3
+    //     );
+    //     return;
+    //   }
+    //   bassFilter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+    //   bassFilter.frequency.exponentialRampToValueAtTime(
+    //     8000,
+    //     audioContext.currentTime + 0.3
+    //   );
+    // }
   };
 
   const visualize = useCallback(() => {
     animationFrameId = requestAnimationFrame(visualize);
 
-    if (analyser && dataArray) {
-      analyser.getByteFrequencyData(dataArray);
+    if (bassAnalyser && trebleAnalyser && bassDataArray && trebleDataArray) {
+      bassAnalyser.getByteFrequencyData(bassDataArray);
+      trebleAnalyser.getByteFrequencyData(trebleDataArray);
 
       // Calculate the average of the bass values
-      const average =
-        dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+      const normalizedBassAverage =
+        (bassDataArray.reduce((sum, value) => sum + value, 0) /
+        bassDataArray.length)/255;
 
-      const normalizedGain = (average - 0) / (255 - 0);
+      const normalizedTrebleAverage =
+        (trebleDataArray.reduce((sum, value) => sum + value, 0) /
+        trebleDataArray.length)/255;
 
+        // console.log(`bass: ${normalizedBassAverage} treble: ${normalizedTrebleAverage}`)
+
+      //bass values vary between .15 and .21 from the filter
       api.set({
-        gain: 1 + normalizedGain,
-        spectrumList: Array.from(dataArray),
+        bassGain: rangeConversion(normalizedBassAverage, 0.15,0.21,0,1),
+        trebleGain: normalizedTrebleAverage,
       });
     }
   }, []);
@@ -79,23 +90,41 @@ const useSpringAudioSpectrum = (
     }
 
     if (audioRef.current && source) {
-      if (!analyser) {
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = fftSize;
+      if (!bassAnalyser) {
+        bassAnalyser = audioContext.createAnalyser();
+        bassAnalyser.fftSize = fftSize;
       }
 
-      if (!filter) {
-        filter = audioContext.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 1000;
+      if (!trebleAnalyser) {
+        trebleAnalyser = audioContext.createAnalyser();
+        trebleAnalyser.fftSize = fftSize;
       }
 
-      source.connect(filter);
-      filter.connect(analyser);
-      analyser.connect(audioContext.destination);
+      if (!bassFilter) {
+        bassFilter = audioContext.createBiquadFilter();
+        bassFilter.type = 'lowpass';
+        bassFilter.frequency.value = 100;
+      }
 
-      if (!dataArray) {
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
+      if (!trebleFilter) {
+        trebleFilter = audioContext.createBiquadFilter();
+        trebleFilter.type = 'highpass';
+        trebleFilter.frequency.value = 300;
+      }
+
+      source.connect(bassFilter);
+      source.connect(trebleFilter);
+      bassFilter.connect(bassAnalyser);
+      trebleFilter.connect(trebleAnalyser);
+      bassAnalyser.connect(audioContext.destination);
+      trebleAnalyser.connect(audioContext.destination);
+
+      if (!bassDataArray) {
+        bassDataArray = new Uint8Array(trebleAnalyser.frequencyBinCount);
+      }
+
+      if (!trebleDataArray) {
+        trebleDataArray = new Uint8Array(trebleAnalyser.frequencyBinCount);
       }
     }
   };

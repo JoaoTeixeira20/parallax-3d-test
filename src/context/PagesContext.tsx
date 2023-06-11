@@ -14,8 +14,8 @@ import React, {
 
 type PagesContextProps = {
   spring: {
-    gain: SpringValue<number>;
-    spectrumList: SpringValue<any[]>;
+    bassGain: SpringValue<number>;
+    trebleGain: SpringValue<number>;
   };
   focusPos: { x: number; y: number };
   changeAudio: (url: string) => void;

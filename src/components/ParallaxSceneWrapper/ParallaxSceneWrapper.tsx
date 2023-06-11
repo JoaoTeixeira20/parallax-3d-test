@@ -3,7 +3,6 @@ import React, {
   ReactElement,
   useCallback,
   useContext,
-  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -19,11 +18,17 @@ type ParallaxSceneWrapperProps = {
 const ParallaxSceneWrapper = (
   props: ParallaxSceneWrapperProps
 ): ReactElement => {
+  const {
+    spring,
+    focusPos,
+    setFilterEnabled,
+    isMobileRef,
+  } = useContext(PagesContext);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [activeContainer, setActiveContainer] = useState<boolean[]>(
-    items.map((_, index) => (index === 0 ? true : false))
+    items.map((_, index) => (index === 0 && isMobileRef.current ? true : false))
   );
-  useDrag(
+  const bind = useDrag(
     (state) => {
       const { swipe } = state;
       if (swipe[1] === -1) {
@@ -49,19 +54,13 @@ const ParallaxSceneWrapper = (
         });
       }
     },
-    {
-      target: window,
-      pointer: {
-        touch: true,
-      },
-    }
+     {
+    //   target: window,
+       pointer: {
+         touch: true,
+       },
+     }
   );
-  const {
-    spring,
-    focusPos,
-    setFilterEnabled,
-    isMobileRef,
-  } = useContext(PagesContext);
   const navigate = useNavigate();
 
   const handleMouseOverEvent = useCallback(() => {
@@ -82,13 +81,14 @@ const ParallaxSceneWrapper = (
       )}
       <div
         ref={containerRef}
-        className="flex flex-row flex-wrap justify-center"
+        className="flex flex-row flex-wrap justify-center max-w-screen-xl"
         style={{ touchAction: 'none' }}
+        {...bind()}
       >
         {items.map((el, index) => (
           <ParallaxScene
             key={index}
-            snapScroll={activeContainer[index]}
+            active={activeContainer[index]}
             springRef={spring}
             mouseX={focusPos.x}
             mouseY={focusPos.y}

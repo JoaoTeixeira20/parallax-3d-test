@@ -1,20 +1,20 @@
-import useAudioVisualizer from '@/hooks/useAudioVisualizer';
-import React, { ReactElement, useEffect, useRef } from 'react';
+import useAudioVisualizer from '@/hooks/useSpringAudioSpectrum';
+import { animated } from '@react-spring/web';
+import React, { ReactElement, useRef } from 'react';
 
 const AudioAnalyser = (): ReactElement => {
   const audioRef = useRef(null);
-  const { gain, spectrumList, setFilterEnabled } = useAudioVisualizer(audioRef, 64);
+  const { spring } = useAudioVisualizer(audioRef, 64);
 
-  useEffect(() => {
-    setFilterEnabled(true);
-  },[]);
+  // useEffect(() => {
+  //   setFilterEnabled(false);
+  // },[]);
 
   return (
     <div className="flex flex-row flex-wrap">
-      <audio ref={audioRef} src="assets/intensify.mp3" controls></audio>
-      <div className="flex flex-row items-end" style={{ height: 250 }}>
-        {spectrumList &&
-          spectrumList?.map((el, index) => {
+      <audio ref={audioRef} src="assets/letmedownslowly.mp3" controls></audio>
+      {/* <div className="flex flex-row items-end" style={{ height: 250 }}>
+          {spring.spectrumList.get().map((el, index) => {
             return (
               <div
                 key={index}
@@ -27,19 +27,24 @@ const AudioAnalyser = (): ReactElement => {
               ></div>
             );
           })}
-      </div>
-      <div
+      </div> */}
+      <div className='flex items-center justify-center' style={{width: "300px", height:"300px"}}>
+      <animated.div
         style={{
           backgroundColor: 'red',
-          width: gain * 200,
-          height: gain * 200,
+          width: spring.trebleGain.to([0,1],[0,200]),
+          height: spring.trebleGain.to([0,1],[0,200]),
           borderRadius: '50%',
+          outlineColor: 'green',
+          outlineStyle: 'solid',
+          outlineWidth: spring.bassGain.to([0.09,0.12],[0,20]),
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        {gain}
+        hi
+      </animated.div>
       </div>
     </div>
   );

@@ -20,10 +20,10 @@ const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
-  snapScroll?: boolean;
+  active?: boolean;
   springRef: {
-    gain: SpringValue<number>;
-    spectrumList: SpringValue<any[]>;
+    bassGain: SpringValue<number>;
+    trebleGain: SpringValue<number>;
   };
   mouseX: number;
   mouseY: number;
@@ -45,7 +45,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
       },
       textSize: props.cubeSize * 0.15,
       ringContainerDistance: (props.cubeSize / 2) * 0.6,
-      outLineRingWidth: props.cubeSize * 0.05,
+      outLineRingWidth: props.cubeSize * 0.1,
     }),
     [props.cubeSize]
   );
@@ -61,17 +61,17 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
       centerCubeX: 0,
       centerCubeY: 0,
     });
-  const [isOvering, setIsOvering] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState<boolean | undefined>(props.active);
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
   const spring = useSpring({
     ...parallax(props.mouseX, props.mouseY, centerCubeX, centerCubeY),
-    backgroundColor: isOvering
+    backgroundColor: isActive
       ? 'rgba(250, 204, 21,0.9)'
-      : 'rgba(250, 204, 21,0.2)',
-    scale: isOvering ? 1.3 : 1,
-    borderRadius: isOvering ? '1%' : '50%',
+      : 'rgba(250, 204, 21,0.1)',
+    scale: isActive ? 1.3 : 1,
+    borderRadius: isActive ? '1%' : '50%',
     config: { ...springConfig.wobbly, clamp: true },
   });
 
@@ -97,22 +97,22 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   }, []);
 
   useEffect(() => {
-    if (props.snapScroll === true) {
+    if (props.active === true) {
       window.scrollTo(0, centerCubeY - window.innerHeight / 2);
-      setIsOvering(true);
+      setIsActive(true);
       return;
     }
-    setIsOvering(false);
-  }, [props.snapScroll, centerCubeY]);
+    setIsActive(false);
+  }, [props.active, centerCubeY]);
 
   const handleOver = useCallback(() => {
     props.onMouseOverHandler && props.onMouseOverHandler();
-    setIsOvering(true);
+    setIsActive(true);
   }, []);
 
   const handleOverOut = useCallback(() => {
     props.onMouseOutHandler && props.onMouseOutHandler();
-    setIsOvering(false);
+    setIsActive(false);
   }, []);
 
   const handleClick = useCallback(
@@ -168,8 +168,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           cursor-pointer
           select-none"
           style={{
-            translateZ: props.springRef.gain.to(
-              [1, 2],
+            translateZ: props.springRef.trebleGain.to(
+              [0, 1],
               [
                 cubeProps.springGainInterpolationSize.start,
                 cubeProps.springGainInterpolationSize.end,
@@ -178,11 +178,12 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
             scale: 0.85,
             fontSize: cubeProps.textSize,
             backgroundColor: spring.backgroundColor,
-            outlineWidth: cubeProps.outLineRingWidth,
-            outlineColor: props.springRef.gain.to(
-              [1, 2],
+            outlineWidth: props.springRef.bassGain.to([0,1],[cubeProps.outLineRingWidth/2, cubeProps.outLineRingWidth*1.2]),
+            outlineColor: props.springRef.bassGain.to(
+              [0,1],
               ['rgb(165 243 252)', 'rgb(22 78 99)']
             ),
+            filter: props.springRef.bassGain.to([0.9,1],[`blur(0px)`,`blur(1px)`]),
             borderRadius: spring.borderRadius,
 
             textShadow:

@@ -11,8 +11,8 @@ const Main = (props: PropsWithChildren) => {
       //   onClick={playMusic}
       className="relative min-h-screen w-screen flex justify-center"
       style={{
-        backgroundColor: spring.gain.to(
-          [1, 2],
+        backgroundColor: spring.trebleGain.to(
+          [0, 1],
           ['rgb(100 116 139', 'rgb(30 41 59']
         ),
       }}

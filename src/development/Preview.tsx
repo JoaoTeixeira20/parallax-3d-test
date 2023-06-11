@@ -4,10 +4,12 @@ import ErrorStackTrace from './ErrorStackTrace/ErrorStackTrace';
 import { PagesContextProvider } from '@/context/PagesContext';
 import Root from '@/routes/Root';
 import { BrowserRouter } from 'react-router-dom';
+import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
 
 const App = () => (
   <div className='min-w-full min-h-screen flex'>
     <ErrorStackTrace>
+      {/* <AudioAnalyser/> */}
       <PagesContextProvider>
         <BrowserRouter>
           <Root />
