@@ -34,7 +34,7 @@ const PagesContext = createContext<PagesContextProps>({} as PagesContextProps);
 const PagesContextProvider = (
   props: PropsWithChildren<PagesContextProviderProps>
 ) => {
-  const isMobileRef = useRef<boolean>(false);
+  const isMobileRef = useRef<boolean>(window.matchMedia('(pointer: coarse)').matches ? true : false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { spring, setFilterEnabled } = useSpringAudioSpectrum(audioRef, 32);
   const scrollRef = useRef({ x: 0, y: 0 });
@@ -84,11 +84,11 @@ const PagesContextProvider = (
   }, []);
 
   useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches) {
-      isMobileRef.current = true;
+    if (isMobileRef.current) {
       setFocusPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
       setFilterEnabled(false);
     } else {
+      setFilterEnabled(true);
       console.log("it's not a touchscreen");
     }
     changeAudio('/assets/intensify.mp3');

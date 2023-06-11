@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -18,16 +19,17 @@ type ParallaxSceneWrapperProps = {
 const ParallaxSceneWrapper = (
   props: ParallaxSceneWrapperProps
 ): ReactElement => {
-  const {
-    spring,
-    focusPos,
-    setFilterEnabled,
-    isMobileRef,
-  } = useContext(PagesContext);
+  const { spring, focusPos, setFilterEnabled, isMobileRef } =
+    useContext(PagesContext);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [activeContainer, setActiveContainer] = useState<boolean[]>(
-    items.map((_, index) => (index === 0 && isMobileRef.current ? true : false))
+    items.map((_, index) =>
+      props.index === index && isMobileRef.current
+        ? true
+        : false
+    )
   );
+
   const bind = useDrag(
     (state) => {
       const { swipe } = state;
@@ -54,18 +56,19 @@ const ParallaxSceneWrapper = (
         });
       }
     },
-     {
-    //   target: window,
-       pointer: {
-         touch: true,
-       },
-     }
+    {
+      //   target: window,
+      pointer: {
+        touch: true,
+      },
+    }
   );
   const navigate = useNavigate();
 
   const handleMouseOverEvent = useCallback(() => {
     setFilterEnabled(false);
   }, []);
+
   const handleMouseOutEvent = useCallback(() => {
     setFilterEnabled(true);
   }, []);
@@ -106,6 +109,10 @@ const ParallaxSceneWrapper = (
       )}
     </>
   );
+};
+
+ParallaxSceneWrapper.defaultProps = {
+  index: 0,
 };
 
 export default ParallaxSceneWrapper;

@@ -49,15 +49,11 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     }),
     [props.cubeSize]
   );
-  const [{ cubeLeft, cubeTop, centerCubeX, centerCubeY }, setCubeCoords] =
+  const [{ centerCubeX, centerCubeY }, setCubeCoords] =
     useState<{
-      cubeLeft: number;
-      cubeTop: number;
       centerCubeX: number;
       centerCubeY: number;
     }>({
-      cubeLeft: 0,
-      cubeTop: 0,
       centerCubeX: 0,
       centerCubeY: 0,
     });
@@ -66,7 +62,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   const cubeRef = useRef<HTMLDivElement>(null);
 
   const spring = useSpring({
-    ...parallax(props.mouseX, props.mouseY, centerCubeX, centerCubeY),
+    ...parallax(props.mouseX, props.mouseY, centerCubeX, centerCubeY, 45),
     backgroundColor: isActive
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -85,8 +81,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           height,
         } = cubeRef.current?.getBoundingClientRect();
         setCubeCoords({
-          cubeLeft: left,
-          cubeTop: top,
           centerCubeX: left + window.scrollX + width / 2,
           centerCubeY: top + window.scrollY + height / 2,
         });
@@ -178,12 +172,15 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
             scale: 0.85,
             fontSize: cubeProps.textSize,
             backgroundColor: spring.backgroundColor,
-            outlineWidth: props.springRef.bassGain.to([0,1],[cubeProps.outLineRingWidth/2, cubeProps.outLineRingWidth*1.2]),
+            outlineWidth: props.springRef.bassGain.to(
+              [0, 1],
+              [cubeProps.outLineRingWidth / 2, cubeProps.outLineRingWidth * 1.2]
+            ),
             outlineColor: props.springRef.bassGain.to(
-              [0,1],
+              [0, 1],
               ['rgb(165 243 252)', 'rgb(22 78 99)']
             ),
-            filter: props.springRef.bassGain.to([0.9,1],[`blur(0px)`,`blur(1px)`]),
+            // filter: props.springRef.bassGain.to([0.9,1],[`blur(0px)`,`blur(1px)`]),
             borderRadius: spring.borderRadius,
 
             textShadow:
