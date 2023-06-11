@@ -13,7 +13,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/?id=${props.index}`);
+    navigate(`/${props.index}`);
   };
 
   useEffect(() => {

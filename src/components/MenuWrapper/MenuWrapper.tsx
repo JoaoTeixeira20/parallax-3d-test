@@ -1,12 +1,13 @@
 import React, { ReactElement } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import ParallaxSceneWrapper from '../ParallaxSceneWrapper/ParallaxSceneWrapper';
+import { useParams } from 'react-router';
 
 const MenuWrapper = (): ReactElement => {
-  const [params, _] = useSearchParams();
+
+  const params = useParams();
 
   return (
-      <ParallaxSceneWrapper index={Number(params.get('id'))} />
+      <ParallaxSceneWrapper index={Number(params['id'])} />
   );
 };
 
