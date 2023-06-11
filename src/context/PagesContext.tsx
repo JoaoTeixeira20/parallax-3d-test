@@ -79,8 +79,7 @@ const PagesContextProvider = (
       setFilterEnabled(true);
       console.log("it's not a touchscreen");
     }
-    // @TODO: check this later
-    // changeAudio(`${window.location.href}assets/intensify.mp3`);
+    changeAudio(`${window.location.origin}${window.location.pathname}assets/intensify.mp3`);
     window.addEventListener('mousemove', handleMouseMove);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -101,7 +100,7 @@ const PagesContextProvider = (
         scrollRef,
       }}
     >
-      <audio src="/assets/intensify.mp3" className="absolute z-10" ref={audioRef} controls></audio>
+      <audio className="absolute z-10" ref={audioRef} controls></audio>
       {props.children}
     </PagesContext.Provider>
   );

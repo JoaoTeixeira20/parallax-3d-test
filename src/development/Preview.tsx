@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import ErrorStackTrace from './ErrorStackTrace/ErrorStackTrace';
 import { PagesContextProvider } from '@/context/PagesContext';
 import Root from '@/routes/Root';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
 
 const App = () => (
@@ -11,9 +11,9 @@ const App = () => (
     <ErrorStackTrace>
       {/* <AudioAnalyser/> */}
       <PagesContextProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Root />
-        </BrowserRouter>
+        </HashRouter>
       </PagesContextProvider>
     </ErrorStackTrace>
   </div>
