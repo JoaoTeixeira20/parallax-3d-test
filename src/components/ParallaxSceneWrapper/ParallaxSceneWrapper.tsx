@@ -25,6 +25,8 @@ const ParallaxSceneWrapper = (
     items.map((_, index) =>
       props.index === index && isMobileRef.current
         ? true
+        : !props.index && index === 0
+        ? true
         : false
     )
   );
