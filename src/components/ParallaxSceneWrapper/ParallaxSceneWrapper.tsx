@@ -3,8 +3,6 @@ import React, {
   ReactElement,
   useCallback,
   useContext,
-  useEffect,
-  useRef,
   useState,
 } from 'react';
 import ParallaxScene from '../ParallaxScene/ParallaxScene';
@@ -21,49 +19,49 @@ const ParallaxSceneWrapper = (
 ): ReactElement => {
   const { spring, focusPos, setFilterEnabled, isMobileRef } =
     useContext(PagesContext);
-  const [activeContainer, setActiveContainer] = useState<boolean[]>(
-    items.map((_, index) =>
-      props.index === index && isMobileRef.current
-        ? true
-        : !props.index && index === 0
-        ? true
-        : false
-    )
-  );
+  // const [activeContainer, setActiveContainer] = useState<boolean[]>(
+  //   items.map((_, index) =>
+  //     props.index === index && isMobileRef.current
+  //       ? true
+  //       : !props.index && index === 0
+  //       ? true
+  //       : false
+  //   )
+  // );
 
-  const bind = useDrag(
-    (state) => {
-      const { swipe } = state;
-      if (swipe[1] === -1) {
-        setActiveContainer((prev) => {
-          const index = prev.indexOf(true);
-          if (index < prev.length - 1) {
-            prev[index] = false;
-            prev[index + 1] = true;
-            return [...prev];
-          }
-          return prev;
-        });
-      }
-      if (swipe[1] === 1) {
-        setActiveContainer((prev) => {
-          const index = prev.indexOf(true);
-          if (index > 0) {
-            prev[index] = false;
-            prev[index - 1] = true;
-            return [...prev];
-          }
-          return prev;
-        });
-      }
-    },
-    {
-      //   target: window,
-      pointer: {
-        touch: true,
-      },
-    }
-  );
+  // const bind = useDrag(
+  //   (state) => {
+  //     const { swipe } = state;
+  //     if (swipe[1] === -1) {
+  //       setActiveContainer((prev) => {
+  //         const index = prev.indexOf(true);
+  //         if (index < prev.length - 1) {
+  //           prev[index] = false;
+  //           prev[index + 1] = true;
+  //           return [...prev];
+  //         }
+  //         return prev;
+  //       });
+  //     }
+  //     if (swipe[1] === 1) {
+  //       setActiveContainer((prev) => {
+  //         const index = prev.indexOf(true);
+  //         if (index > 0) {
+  //           prev[index] = false;
+  //           prev[index - 1] = true;
+  //           return [...prev];
+  //         }
+  //         return prev;
+  //       });
+  //     }
+  //   },
+  //   {
+  //     //   target: window,
+  //     pointer: {
+  //       touch: true,
+  //     },
+  //   }
+  // );
   const navigate = useNavigate();
 
   const handleMouseOverEvent = useCallback(() => {
@@ -80,18 +78,19 @@ const ParallaxSceneWrapper = (
 
   return (
     <>
-      {isMobileRef.current === true && (
+      {/* {isMobileRef.current === true && (
         <div style={{ height: (200 * 1.8) / 2, width: 200 * 1.8 }}></div>
-      )}
+      )} */}
       <div
         className="flex flex-row flex-wrap justify-center max-w-screen-xl"
-        style={{ touchAction: 'none' }}
-        {...bind()}
+        // style={{ touchAction: 'none' }}
+        // {...bind()}
       >
         {items.map((el, index) => (
           <ParallaxScene
             key={index}
-            active={activeContainer[index]}
+            // active={activeContainer[index]}
+            active={false}
             springRef={spring}
             mouseX={focusPos.x}
             mouseY={focusPos.y}
@@ -104,9 +103,9 @@ const ParallaxSceneWrapper = (
           </ParallaxScene>
         ))}
       </div>
-      {isMobileRef.current === true && (
+      {/* {isMobileRef.current === true && (
         <div style={{ height: (200 * 1.8) / 2, width: 200 * 1.8 }}></div>
-      )}
+      )} */}
     </>
   );
 };

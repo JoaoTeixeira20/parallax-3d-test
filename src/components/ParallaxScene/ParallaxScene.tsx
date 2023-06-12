@@ -14,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { parallax } from '@/helpers/formulas';
+import { debounce, parallax } from '@/helpers/formulas';
 import useMeasure from '@/hooks/useMeasure';
 
 const DISTANCE = 0;
@@ -47,22 +47,25 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
       textSize: props.cubeSize * 0.15,
       ringContainerDistance: (props.cubeSize / 2) * 0.6,
       outLineRingWidth: props.cubeSize * 0.1,
+      scrollMarginSize: props.cubeSize * 0.9,
     }),
     [props.cubeSize]
   );
-  const [ref, bounds] = useMeasure({ scroll: true, debounce: 10 });
+  const [ref, bounds] = useMeasure({ scroll: true });
   const [isActive, setIsActive] = useState<boolean | undefined>(props.active);
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
+  const { centerX, centerY } = useMemo(
+    () => ({
+      centerX: bounds.left + bounds.width / 2,
+      centerY: bounds.top + bounds.height / 2,
+    }),
+    [bounds]
+  );
+
   const spring = useSpring({
-    ...parallax(
-      props.mouseX,
-      props.mouseY,
-      bounds.left + bounds.width / 2,
-      bounds.top + bounds.height / 2,
-      45
-    ),
+    ...parallax(props.mouseX, props.mouseY, centerX, centerY, 45),
     backgroundColor: isActive
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -72,18 +75,34 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   });
 
   useEffect(() => {
+    const screenY = window.innerHeight / 2;
+    const scrollTo = Math.abs(screenY - centerY) < cubeProps.scrollMarginSize;
+    if (scrollTo) {
+      setIsActive(true);
+      return;
+    }
+    setIsActive(false);
+  }, [bounds]);
+
+  useEffect(() => {
     setTimeout(() => {
-      if (props.active === true) {
-        // window.scrollTo(0, centerCubeY - window.innerHeight / 2);
-        cubeRef.current?.scrollIntoView({ block: 'center' });
-        setIsActive(true);
-        return;
-      }
-      setIsActive(false);
-      // triggering an event so useMeasure has time to react to the change
       window.dispatchEvent(new Event('resize'));
     }, 300);
-  }, [props.active]);
+  }, []);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (props.active === true) {
+  //       // window.scrollTo(0, centerCubeY - window.innerHeight / 2);
+  //       cubeRef.current?.scrollIntoView({ block: 'center' });
+  //       setIsActive(true);
+  //       return;
+  //     }
+  //     setIsActive(false);
+  //     // triggering an event so useMeasure has time to react to the change
+  //     window.dispatchEvent(new Event('resize'));
+  //   }, 300);
+  // }, [props.active]);
 
   const handleOver = useCallback(() => {
     props.onMouseOverHandler && props.onMouseOverHandler();
@@ -95,10 +114,13 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     setIsActive(false);
   }, []);
 
-  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
-    // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
-    props.onClickHandler(event);
-  }, []);
+  const handleClick = useCallback(
+    (event: SyntheticEvent<HTMLElement>) => {
+      // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
+      props.onClickHandler(event);
+    },
+    [isActive]
+  );
 
   return (
     <div
