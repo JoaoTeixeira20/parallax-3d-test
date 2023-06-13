@@ -9,7 +9,7 @@ type CardContentProps = {
 
 const CardContent = (props: CardContentProps): ReactElement => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { focusPos, spring, setFilterEnabled } = useContext(PagesContext);
+  const { spring } = useContext(PagesContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -27,8 +27,6 @@ const CardContent = (props: CardContentProps): ReactElement => {
     <div ref={containerRef} className="container block relative">
       <div className="sticky top-0 float-left">
         <ParallaxScene
-          mouseX={focusPos.x}
-          mouseY={focusPos.y}
           springRef={spring}
           cubeSize={100}
           onClickHandler={handleClick}

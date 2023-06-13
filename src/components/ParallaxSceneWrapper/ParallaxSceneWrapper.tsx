@@ -15,7 +15,7 @@ type ParallaxSceneWrapperProps = {
 const ParallaxSceneWrapper = (
   props: ParallaxSceneWrapperProps
 ): ReactElement => {
-  const { spring, focusPos, isMobileRef } =
+  const { spring, isMobileRef } =
     useContext(PagesContext);
 
   const navigate = useNavigate();
@@ -34,8 +34,6 @@ const ParallaxSceneWrapper = (
             key={index}
             active={props.index === index}
             springRef={spring}
-            mouseX={focusPos.x}
-            mouseY={focusPos.y}
             cubeSize={200}
             mobileBehaviour={isMobileRef.current}
             onClickHandler={handleClickEvent.bind(null, index)}

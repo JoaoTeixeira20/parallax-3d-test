@@ -26,8 +26,6 @@ type ParallaxSceneProps = PropsWithChildren<{
     bassGain: SpringValue<number>;
     trebleGain: SpringValue<number>;
   };
-  mouseX: number;
-  mouseY: number;
   cubeSize: number;
   mobileBehaviour?: boolean;
   onMouseOverHandler?: () => void;
@@ -66,8 +64,16 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     [bounds]
   );
 
+  const [focusSpring, api] = useSpring(
+    {
+      rotateX: 0,
+      rotateY: 0,
+      config: { ...springConfig.wobbly, clamp: true },
+    },
+    []
+  );
+
   const spring = useSpring({
-    ...parallax(props.mouseX, props.mouseY, centerX, centerY, 45),
     backgroundColor: isActive
       ? 'rgba(250, 204, 21,0.9)'
       : 'rgba(250, 204, 21,0.1)',
@@ -75,6 +81,14 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     borderRadius: isActive ? '1%' : '50%',
     config: { ...springConfig.wobbly, clamp: true },
   });
+
+  const handleMouseMove = useCallback(
+    (event: MouseEvent) => {
+      if (props.mobileBehaviour) return;
+      api.start(parallax(event.clientX, event.clientY, centerX, centerY, 45));
+    },
+    [bounds]
+  );
 
   useEffect(() => {
     if (props.mobileBehaviour) {
@@ -85,8 +99,26 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         return;
       }
       setIsActive(false);
-      return
+      return;
     }
+  }, [bounds]);
+
+  useEffect(() => {
+    if (props.mobileBehaviour) {
+      api.start(
+        parallax(
+          window.innerWidth / 2,
+          window.innerHeight / 2,
+          centerX,
+          centerY,
+          45
+        )
+      );
+    }
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, [bounds]);
 
   useEffect(() => {
@@ -96,7 +128,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     props.active &&
       props.mobileBehaviour &&
       setTimeout(() => {
-        cubeRef.current?.scrollIntoView({block:"center"})
+        cubeRef.current?.scrollIntoView({ block: 'center' });
       }, 300);
   }, []);
 
@@ -113,8 +145,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   const handleClick = useCallback(
     (event: SyntheticEvent<HTMLElement>) => {
       // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
-      if(!isActive && props.mobileBehaviour) {
-        cubeRef.current?.scrollIntoView({block:'center'});
+      if (!isActive && props.mobileBehaviour) {
+        cubeRef.current?.scrollIntoView({ block: 'center' });
         return;
       }
       props.onClickHandler(event);
@@ -156,8 +188,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           height: `${cubeProps.originalSize}px`,
           transformStyle: 'preserve-3d',
           perspective: PERSPECTIVE,
-          rotateX: spring.rotateX,
-          rotateY: spring.rotateY,
+          rotateX: focusSpring.rotateX,
+          rotateY: focusSpring.rotateY,
           translate3d: ['0%', '0%', DISTANCE],
           scale: spring.scale,
         }}
