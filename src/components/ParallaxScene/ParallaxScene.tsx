@@ -14,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { debounce, parallax } from '@/helpers/formulas';
+import { parallax } from '@/helpers/formulas';
 import useMeasure from '@/hooks/useMeasure';
 
 const DISTANCE = 0;
@@ -29,6 +29,7 @@ type ParallaxSceneProps = PropsWithChildren<{
   mouseX: number;
   mouseY: number;
   cubeSize: number;
+  mobileBehaviour?: boolean;
   onMouseOverHandler?: () => void;
   onMouseOutHandler?: () => void;
   onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
@@ -51,8 +52,9 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     }),
     [props.cubeSize]
   );
+
   const [ref, bounds] = useMeasure({ scroll: true });
-  const [isActive, setIsActive] = useState<boolean | undefined>(props.active);
+  const [isActive, setIsActive] = useState<boolean | null>(null);
 
   const cubeRef = useRef<HTMLDivElement>(null);
 
@@ -75,48 +77,46 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   });
 
   useEffect(() => {
-    const screenY = window.innerHeight / 2;
-    const scrollTo = Math.abs(screenY - centerY) < cubeProps.scrollMarginSize;
-    if (scrollTo) {
-      setIsActive(true);
-      return;
+    if (props.mobileBehaviour) {
+      const screenY = window.innerHeight / 2;
+      const scrollTo = Math.abs(screenY - centerY) < cubeProps.scrollMarginSize;
+      if (scrollTo) {
+        setIsActive(true);
+        return;
+      }
+      setIsActive(false);
+      return
     }
-    setIsActive(false);
   }, [bounds]);
 
   useEffect(() => {
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 300);
+    props.active &&
+      props.mobileBehaviour &&
+      setTimeout(() => {
+        cubeRef.current?.scrollIntoView({block:"center"})
+      }, 300);
   }, []);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (props.active === true) {
-  //       // window.scrollTo(0, centerCubeY - window.innerHeight / 2);
-  //       cubeRef.current?.scrollIntoView({ block: 'center' });
-  //       setIsActive(true);
-  //       return;
-  //     }
-  //     setIsActive(false);
-  //     // triggering an event so useMeasure has time to react to the change
-  //     window.dispatchEvent(new Event('resize'));
-  //   }, 300);
-  // }, [props.active]);
 
   const handleOver = useCallback(() => {
     props.onMouseOverHandler && props.onMouseOverHandler();
-    setIsActive(true);
+    !props.mobileBehaviour && setIsActive(true);
   }, []);
 
   const handleOverOut = useCallback(() => {
     props.onMouseOutHandler && props.onMouseOutHandler();
-    setIsActive(false);
+    !props.mobileBehaviour && setIsActive(false);
   }, []);
 
   const handleClick = useCallback(
     (event: SyntheticEvent<HTMLElement>) => {
       // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
+      if(!isActive && props.mobileBehaviour) {
+        cubeRef.current?.scrollIntoView({block:'center'});
+        return;
+      }
       props.onClickHandler(event);
     },
     [isActive]
@@ -194,7 +194,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
               [0, 1],
               ['rgb(165 243 252)', 'rgb(22 78 99)']
             ),
-            // filter: props.springRef.bassGain.to([0.9,1],[`blur(0px)`,`blur(1px)`]),
             borderRadius: spring.borderRadius,
 
             textShadow:

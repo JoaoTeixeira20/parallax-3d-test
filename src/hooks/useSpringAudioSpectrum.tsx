@@ -2,8 +2,14 @@ import { rangeConversion } from '@/helpers/formulas';
 import { SpringValue, useSpring } from '@react-spring/web';
 import { useCallback, useEffect } from 'react';
 
-const BASS_FILTER = 100;
-const TREBLE_FILTER = 300;
+const BASS_FILTER = {
+  ACTIVE: 5,
+  INACTIVE: 100,
+};
+const TREBLE_FILTER = {
+  ACTIVE: 600,
+  INACTIVE: 300,
+};
 
 let animationFrameId: number;
 let audioContext: AudioContext = new AudioContext();
@@ -12,14 +18,16 @@ let bassDataArray: Uint8Array | null = null;
 let trebleDataArray: Uint8Array | null = null;
 let bassAnalyser: AnalyserNode | null = null;
 let trebleAnalyser: AnalyserNode | null = null;
-let bassFilter: BiquadFilterNode | null = null;
-let trebleFilter: BiquadFilterNode | null = null;
+let bassFilterAnalyser: BiquadFilterNode | null = null;
+let trebleFilterAnalyser: BiquadFilterNode | null = null;
+let gainNode: GainNode | null = null;
 
 const useSpringAudioSpectrum = (
   audioRef: React.RefObject<HTMLAudioElement>,
   fftSize: number
 ): {
   setFilterEnabled: (state: boolean) => void;
+  changeVolume: (value: number) => void;
   spring: {
     bassGain: SpringValue<number>;
     trebleGain: SpringValue<number>;
@@ -35,32 +43,39 @@ const useSpringAudioSpectrum = (
   );
 
   const setFilterEnabled = (state: boolean) => {
-    if (trebleFilter && bassFilter && audioContext) {
+    if (trebleFilterAnalyser && bassFilterAnalyser && audioContext) {
       if (state) {
-        trebleFilter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
-        trebleFilter.frequency.exponentialRampToValueAtTime(
-          1000,
-          audioContext.currentTime + 1
+        trebleFilterAnalyser.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+        trebleFilterAnalyser.frequency.exponentialRampToValueAtTime(
+          TREBLE_FILTER.ACTIVE,
+          audioContext.currentTime + 0.3
         );
-        bassFilter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
-        bassFilter.frequency.exponentialRampToValueAtTime(
-          10,
-          audioContext.currentTime + 1
+        bassFilterAnalyser.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+        bassFilterAnalyser.frequency.exponentialRampToValueAtTime(
+          BASS_FILTER.ACTIVE,
+          audioContext.currentTime + 0.3
         );
         return;
       }
-      trebleFilter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
-      trebleFilter.frequency.exponentialRampToValueAtTime(
-        TREBLE_FILTER,
-        audioContext.currentTime + 1
+      trebleFilterAnalyser.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+      trebleFilterAnalyser.frequency.exponentialRampToValueAtTime(
+        TREBLE_FILTER.INACTIVE,
+        audioContext.currentTime + 0.3
       );
-      bassFilter.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
-      bassFilter.frequency.exponentialRampToValueAtTime(
-        BASS_FILTER,
-        audioContext.currentTime + 1
+      bassFilterAnalyser.frequency.cancelAndHoldAtTime(audioContext?.currentTime);
+      bassFilterAnalyser.frequency.exponentialRampToValueAtTime(
+        BASS_FILTER.INACTIVE,
+        audioContext.currentTime + 0.3
       );
     }
   };
+
+  const changeVolume = (volume: number) => {
+    if(volume > 1) {
+      console.error('volume too loud, select a decimal value between 0 and 1');
+    }
+    gainNode && gainNode.gain.setValueAtTime(volume,audioContext.currentTime);
+  }
 
   const visualize = useCallback(() => {
     animationFrameId = requestAnimationFrame(visualize);
@@ -70,18 +85,20 @@ const useSpringAudioSpectrum = (
       trebleAnalyser.getByteFrequencyData(trebleDataArray);
 
       const normalizedBassAverage =
-        (bassDataArray.reduce((sum, value) => sum + value, 0) /
-        bassDataArray.length)/255;
+        bassDataArray.reduce((sum, value) => sum + value, 0) /
+        bassDataArray.length /
+        255;
 
       const normalizedTrebleAverage =
-        (trebleDataArray.reduce((sum, value) => sum + value, 0) /
-        trebleDataArray.length)/255;
+        trebleDataArray.reduce((sum, value) => sum + value, 0) /
+        trebleDataArray.length /
+        255;
 
-        // console.log(`bass: ${normalizedBassAverage} treble: ${normalizedTrebleAverage}`)
+      // console.log(`bass: ${normalizedBassAverage} treble: ${normalizedTrebleAverage}`)
 
       //bass values vary between .15 and .21 from the filter
       api.set({
-        bassGain: rangeConversion(normalizedBassAverage, 0.15,0.21,0,1),
+        bassGain: rangeConversion(normalizedBassAverage, 0.15, 0.21, 0, 1),
         trebleGain: normalizedTrebleAverage,
       });
     }
@@ -112,24 +129,30 @@ const useSpringAudioSpectrum = (
         trebleAnalyser.fftSize = fftSize;
       }
 
-      if (!bassFilter) {
-        bassFilter = audioContext.createBiquadFilter();
-        bassFilter.type = 'lowpass';
-        bassFilter.frequency.value = BASS_FILTER;
+      if (!bassFilterAnalyser) {
+        bassFilterAnalyser = audioContext.createBiquadFilter();
+        bassFilterAnalyser.type = 'lowpass';
+        bassFilterAnalyser.frequency.value = BASS_FILTER.INACTIVE;
       }
 
-      if (!trebleFilter) {
-        trebleFilter = audioContext.createBiquadFilter();
-        trebleFilter.type = 'highpass';
-        trebleFilter.frequency.value = TREBLE_FILTER;
+      if (!trebleFilterAnalyser) {
+        trebleFilterAnalyser = audioContext.createBiquadFilter();
+        trebleFilterAnalyser.type = 'highpass';
+        trebleFilterAnalyser.frequency.value = TREBLE_FILTER.INACTIVE;
       }
 
-      source.connect(bassFilter);
-      source.connect(trebleFilter);
-      bassFilter.connect(bassAnalyser);
-      trebleFilter.connect(trebleAnalyser);
-      bassAnalyser.connect(audioContext.destination);
-      trebleAnalyser.connect(audioContext.destination);
+      if (!gainNode) {
+        gainNode = audioContext.createGain();
+        gainNode && gainNode.gain.setValueAtTime(0.5,audioContext.currentTime);
+      }
+
+      source.connect(bassFilterAnalyser);
+      source.connect(trebleFilterAnalyser);
+      bassFilterAnalyser.connect(bassAnalyser);
+      trebleFilterAnalyser.connect(trebleAnalyser);
+      bassAnalyser.connect(gainNode);
+      trebleAnalyser.connect(gainNode);
+      gainNode.connect(audioContext.destination);
 
       if (!bassDataArray) {
         bassDataArray = new Uint8Array(trebleAnalyser.frequencyBinCount);
@@ -172,7 +195,7 @@ const useSpringAudioSpectrum = (
     };
   }, []);
 
-  return { spring, setFilterEnabled };
+  return { spring, setFilterEnabled, changeVolume };
 };
 
 export default useSpringAudioSpectrum;

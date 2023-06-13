@@ -24,6 +24,9 @@ const Main = (props: PropsWithChildren) => {
         <div className='overflow-y-auto container'>
           {props.children}
           </div>
+          <h1 className="relative text-center p-3 text-2xl font-bold">
+          im the footer
+        </h1>
       </div>
     </animated.main>
   );

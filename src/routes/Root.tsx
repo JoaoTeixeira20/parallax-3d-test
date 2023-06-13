@@ -1,8 +1,10 @@
-import CardContentRenderer from '@/components/CardContentRenderer/CardContentRenderer';
 import Main from '@/components/Main/Main';
-import MenuWrapper from '@/components/MenuWrapper/MenuWrapper';
+const MenuWrapper = lazy(() => import('@/components/MenuWrapper/MenuWrapper'));
+const CardContentRenderer = lazy(
+  () => import('@/components/CardContentRenderer/CardContentRenderer')
+);
 import { animated, useTransition } from '@react-spring/web';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, Suspense, lazy } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 const Root = (): ReactElement => {
@@ -39,11 +41,32 @@ const Root = (): ReactElement => {
         {transitions((styles, item) => (
           //@ts-expect-error
           <animated.div style={{ ...styles }}>
-              <Routes location={item.pathname}>
-                <Route path="/" Component={MenuWrapper} />
-                <Route path="/:id" Component={MenuWrapper} />
-                <Route path="/cards/:id" Component={CardContentRenderer} />
-              </Routes>
+            <Routes location={item.pathname}>
+              <Route
+                path="/"
+                element={
+                  <Suspense fallback={<div>loading menu...</div>}>
+                    <MenuWrapper />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/:id"
+                element={
+                  <Suspense fallback={<div>loading menu...</div>}>
+                    <MenuWrapper />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/cards/:id"
+                element={
+                  <Suspense fallback={<div>loading card...</div>}>
+                    <CardContentRenderer />
+                  </Suspense>
+                }
+              />
+            </Routes>
           </animated.div>
         ))}
       </div>

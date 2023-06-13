@@ -18,8 +18,6 @@ type PagesContextProps = {
   focusPos: { x: number; y: number };
   changeAudio: (url: string) => void;
   playMusic: () => void;
-  handleMouseOverEvent: () => void;
-  handleMouseOutEvent: () => void;
   setFilterEnabled: (state: boolean) => void;
   isMobileRef: MutableRefObject<boolean>;
   scrollRef: MutableRefObject<{ x: number; y: number }>;
@@ -46,6 +44,7 @@ const PagesContextProvider = (
     setFocusPos({ x: event.pageX, y: event.pageY });
   }, []);
 
+  // @TODO: check
   const changeAudio = (url: string) => {
     fetch(url)
       .then((response) => response.blob())
@@ -64,30 +63,24 @@ const PagesContextProvider = (
     audioRef.current?.play();
   }, []);
 
-  const handleMouseOverEvent = useCallback(() => {
-    setFilterEnabled(false);
-  }, []);
-  const handleMouseOutEvent = useCallback(() => {
-    setFilterEnabled(true);
-  }, []);
+  const handleVisibilityChange = () => {
+    document.hidden ? setFilterEnabled(true) : setFilterEnabled(false);
+  }
 
   useEffect(() => {
     if (isMobileRef.current) {
       setFocusPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-      setFilterEnabled(false);
-    } else {
-      setFilterEnabled(true);
-      console.log("it's not a touchscreen");
-    }
-    // changeAudio(`${window.location.origin}${window.location.pathname}assets/intensify.mp3`);
+    } 
     if(audioRef.current){
-      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/intensify.mp3`;
+      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/privatelanding.mp3`;
       audioRef.current.load();
     } 
 
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
@@ -98,8 +91,6 @@ const PagesContextProvider = (
         focusPos,
         changeAudio,
         playMusic,
-        handleMouseOverEvent,
-        handleMouseOutEvent,
         setFilterEnabled,
         isMobileRef,
         scrollRef,
