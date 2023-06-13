@@ -51,7 +51,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     [props.cubeSize]
   );
 
-  const [ref, bounds] = useMeasure({ scroll: true });
+  const [ref, bounds] = useMeasure({ scroll: true, debounce: 20 });
   const [isActive, setIsActive] = useState<boolean | null>(null);
 
   const cubeRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
 
   const handleMouseMove = useCallback(
     (event: MouseEvent) => {
-      if (props.mobileBehaviour) return;
       api.start(parallax(event.clientX, event.clientY, centerX, centerY, 45));
     },
     [bounds]
@@ -115,9 +114,9 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         )
       );
     }
-    window.addEventListener('mousemove', handleMouseMove);
+    !props.mobileBehaviour && window.addEventListener('mousemove', handleMouseMove);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      !props.mobileBehaviour && window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [bounds]);
 
@@ -125,11 +124,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 300);
-    props.active &&
-      props.mobileBehaviour &&
-      setTimeout(() => {
-        cubeRef.current?.scrollIntoView({ block: 'center' });
-      }, 300);
   }, []);
 
   const handleOver = useCallback(() => {

@@ -7,7 +7,6 @@ import { HashRouter } from 'react-router-dom';
 import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
 
 const App = () => (
-  <div className='min-w-full min-h-screen flex'>
     <ErrorStackTrace>
       {/* <AudioAnalyser/> */}
       <PagesContextProvider>
@@ -16,7 +15,6 @@ const App = () => (
         </HashRouter>
       </PagesContextProvider>
     </ErrorStackTrace>
-  </div>
 );
 
 const root = ReactDOM.createRoot(
