@@ -72,7 +72,7 @@ const PagesContextProvider = (
       setFocusPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
     } 
     if(audioRef.current){
-      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/privatelanding.mp3`;
+      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/intensify.mp3`;
       audioRef.current.load();
     } 
 
