@@ -51,7 +51,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     [props.cubeSize]
   );
 
-  const [ref, bounds] = useMeasure({ scroll: true, debounce: 20 });
+  const [ref, bounds] = useMeasure({ scroll: true });
   const [isActive, setIsActive] = useState<boolean | null>(null);
 
   const cubeRef = useRef<HTMLDivElement>(null);

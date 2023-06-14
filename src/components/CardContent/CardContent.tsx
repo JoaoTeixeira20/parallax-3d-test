@@ -8,23 +8,14 @@ type CardContentProps = {
 };
 
 const CardContent = (props: CardContentProps): ReactElement => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const { spring } = useContext(PagesContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/${props.index}`);
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      containerRef.current &&
-        containerRef.current?.scrollIntoView({ block: 'start' });
-    }, 200);
-  }, []);
-
   return (
-    <div ref={containerRef} className="container block relative">
+    <div className="container block relative">
       <div className="sticky top-0 float-left">
         <ParallaxScene
           springRef={spring}

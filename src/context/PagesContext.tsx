@@ -58,7 +58,7 @@ const PagesContextProvider = (
 
   useEffect(() => {
     if(audioRef.current){
-      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/intensify.mp3`;
+      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/privatelanding.mp3`;
       audioRef.current.load();
     } 
     window.addEventListener("visibilitychange", handleVisibilityChange);
