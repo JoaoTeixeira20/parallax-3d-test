@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   useCallback,
   useContext,
+  useRef,
 } from 'react';
 import ParallaxScene from '../ParallaxScene/ParallaxScene';
 import { useNavigate } from 'react-router-dom';
@@ -15,19 +16,24 @@ type ParallaxSceneWrapperProps = {
 const ParallaxSceneWrapper = (
   props: ParallaxSceneWrapperProps
 ): ReactElement => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const { spring, focusPos, isMobileRef } =
     useContext(PagesContext);
 
   const navigate = useNavigate();
 
   const handleClickEvent = useCallback((index: number) => {
+    //hack to fix blinking router switch route
+    if(wrapperRef.current){
+      wrapperRef.current.style.display = 'none';
+    }
     navigate(`/cards/${index}`);
   }, []);
 
   return (
     <>
-      <div
-        className="flex flex-row flex-wrap justify-center max-w-screen-xl"
+      <div ref={wrapperRef}
+        className="flex flex-row flex-wrap justify-center items-center max-w-screen-xl py-12"
       >
         {items.map((el, index) => (
           <ParallaxScene

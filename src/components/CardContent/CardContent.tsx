@@ -8,24 +8,30 @@ type CardContentProps = {
 };
 
 const CardContent = (props: CardContentProps): ReactElement => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const { focusPos, spring, setFilterEnabled } = useContext(PagesContext);
+  const { focusPos, spring } = useContext(PagesContext);
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    navigate(`/${props.index}`);
+    //hack to fix blinking router switch route
+    if (containerRef.current) {
+      containerRef.current.style.display = 'none';
+    }
+    navigate(`/${props.index}`, { preventScrollReset: false });
   };
 
   useEffect(() => {
+    //another hack to fix the position of the card content if it is scrollable
+    //for some reason it will keep the scroll position...
+    //might be due to route transition
     setTimeout(() => {
-      containerRef.current &&
-        containerRef.current?.scrollIntoView({ block: 'start' });
-    }, 200);
+      window.scrollTo(0, 0);
+    }, 300);
   }, []);
 
   return (
-    <div ref={containerRef} className="container block relative">
-      <div className="sticky top-0 float-left">
+    <div ref={containerRef} className="container relative">
+      <div className="sticky top-14 float-left">
         <ParallaxScene
           mouseX={focusPos.x}
           mouseY={focusPos.y}
@@ -36,7 +42,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
           back from {props.index}
         </ParallaxScene>
       </div>
-      <p className="flex-1">
+      <p>
         hello card content, my index is ${props.index}
         <br />
         sasadsad

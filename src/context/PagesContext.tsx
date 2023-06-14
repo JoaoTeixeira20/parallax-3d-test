@@ -72,7 +72,7 @@ const PagesContextProvider = (
       setFocusPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
     } 
     if(audioRef.current){
-      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/intensify.mp3`;
+      audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/privatelanding.mp3`;
       audioRef.current.load();
     } 
 
@@ -96,7 +96,7 @@ const PagesContextProvider = (
         scrollRef,
       }}
     >
-      <audio className="absolute z-10" ref={audioRef} controls></audio>
+      <audio className="absolute w-28 z-20 opacity-50" ref={audioRef} controls></audio>
       {props.children}
     </PagesContext.Provider>
   );
