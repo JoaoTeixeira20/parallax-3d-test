@@ -174,7 +174,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           border-none
           text-zinc-400
           cursor-pointer
-          select-none"
+          select-none
+          backdrop-blur-sm"
           style={{
             translateZ: props.springRef.trebleGain.to(
               [0, 1],
