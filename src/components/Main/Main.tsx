@@ -42,7 +42,7 @@ const Main = (props: PropsWithChildren) => {
             WebkitBackdropFilter: 'blur(5px)',
             borderTop: '0.1px solid rgba(255, 255, 255, 0.4)',
           }}
-          className="absolute text-center p-3 text-2xl font-bold h-14 bg-cyan-900 w-full text-cyan-900 bottom-0"
+          className="fixed text-center p-3 text-2xl font-bold h-14 bg-cyan-900 w-full text-cyan-900 bottom-0"
         >
           im the footer
         </div>

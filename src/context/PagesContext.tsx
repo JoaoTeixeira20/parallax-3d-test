@@ -7,7 +7,6 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 
 type PagesContextProps = {
@@ -15,12 +14,10 @@ type PagesContextProps = {
     bassGain: SpringValue<number>;
     trebleGain: SpringValue<number>;
   };
-  focusPos: { x: number; y: number };
   changeAudio: (url: string) => void;
   playMusic: () => void;
   setFilterEnabled: (state: boolean) => void;
   isMobileRef: MutableRefObject<boolean>;
-  scrollRef: MutableRefObject<{ x: number; y: number }>;
 };
 
 type PagesContextProviderProps = {};
@@ -33,16 +30,6 @@ const PagesContextProvider = (
   const isMobileRef = useRef<boolean>(window.matchMedia('(pointer: coarse)').matches ? true : false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { spring, setFilterEnabled } = useSpringAudioSpectrum(audioRef, 32);
-  const scrollRef = useRef({ x: 0, y: 0 });
-  const [focusPos, setFocusPos] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
-
-  const handleMouseMove = useCallback((event: MouseEvent) => {
-    if (isMobileRef.current === true) return;
-    setFocusPos({ x: event.pageX, y: event.pageY });
-  }, []);
 
   // @TODO: check
   const changeAudio = (url: string) => {
@@ -68,18 +55,13 @@ const PagesContextProvider = (
   }
 
   useEffect(() => {
-    if (isMobileRef.current) {
-      setFocusPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-    } 
     if(audioRef.current){
       audioRef.current.src = `${window.location.origin}${window.location.pathname}/assets/intensify.mp3`;
       audioRef.current.load();
     } 
 
-    window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
@@ -88,12 +70,10 @@ const PagesContextProvider = (
     <PagesContext.Provider
       value={{
         spring,
-        focusPos,
         changeAudio,
         playMusic,
         setFilterEnabled,
         isMobileRef,
-        scrollRef,
       }}
     >
       <audio className="absolute w-28 z-20 opacity-50" ref={audioRef} controls></audio>

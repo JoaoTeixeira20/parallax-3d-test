@@ -15,7 +15,6 @@ import React, {
   useState,
 } from 'react';
 import { parallax } from '@/helpers/formulas';
-import useMeasure from '@/hooks/useMeasure';
 
 const DISTANCE = 0;
 const PERSPECTIVE = 600;
@@ -26,8 +25,7 @@ type ParallaxSceneProps = PropsWithChildren<{
     bassGain: SpringValue<number>;
     trebleGain: SpringValue<number>;
   };
-  mouseX: number;
-  mouseY: number;
+  centerCoords: number[];
   cubeSize: number;
   mobileBehaviour?: boolean;
   onMouseOverHandler?: () => void;
@@ -36,6 +34,11 @@ type ParallaxSceneProps = PropsWithChildren<{
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
+  const elementRef = useRef<HTMLDivElement>(null);
+  const [elementCenterPos, setElementCenterPos] = useState({
+    left: 0,
+    top: 0,
+  });
   const cubeProps = useMemo(
     () => ({
       containerSize: props.cubeSize * 1.8,
@@ -53,50 +56,64 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     [props.cubeSize]
   );
 
-  const [ref, bounds] = useMeasure({ scroll: true });
   const [isActive, setIsActive] = useState<boolean | null>(null);
 
-  const cubeRef = useRef<HTMLDivElement>(null);
-
-  const { centerX, centerY } = useMemo(
-    () => ({
-      centerX: bounds.left + bounds.width / 2,
-      centerY: bounds.top + bounds.height / 2,
-    }),
-    [bounds]
+  const parallaxCoords = useMemo(
+    () =>
+      parallax(
+        props.centerCoords[0],
+        props.centerCoords[1],
+        elementCenterPos.left,
+        elementCenterPos.top,
+        45
+      ),
+    [props.centerCoords, elementCenterPos]
   );
 
-  const spring = useSpring({
-    ...parallax(props.mouseX, props.mouseY, centerX, centerY, 45),
-    backgroundColor: isActive
-      ? 'rgba(250, 204, 21,0.9)'
-      : 'rgba(250, 204, 21,0.1)',
-    scale: isActive ? 1.3 : 1,
-    borderRadius: isActive ? '1%' : '50%',
-    config: { ...springConfig.wobbly, clamp: true },
-  });
+  const spring = useSpring(
+    {
+      rotateX: parallaxCoords[0],
+      rotateY: parallaxCoords[1],
+      backgroundColor: isActive
+        ? 'rgba(250, 204, 21,0.9)'
+        : 'rgba(250, 204, 21,0.1)',
+      scale: isActive ? 1.3 : 1,
+      borderRadius: isActive ? '1%' : '50%',
+      config: { ...springConfig.wobbly, clamp: true },
+    }
+  );
 
   useEffect(() => {
     if (props.mobileBehaviour) {
-      const screenY = window.innerHeight / 2;
-      const scrollTo = Math.abs(screenY - centerY) < cubeProps.scrollMarginSize;
+      const scrollTo =
+        Math.abs(
+          props.centerCoords[1] -
+            elementCenterPos.top
+        ) < cubeProps.scrollMarginSize;
       if (scrollTo) {
         setIsActive(true);
         return;
       }
       setIsActive(false);
-      return
+      return;
     }
-  }, [bounds]);
+  }, [props.centerCoords, elementCenterPos]);
 
   useEffect(() => {
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+      if (elementRef.current) {
+        const { top, left, width, height } =
+          elementRef.current.getBoundingClientRect();
+        setElementCenterPos({
+          left: left + window.scrollX + width / 2,
+          top: top + window.scrollY + height / 2,
+        });
+      }
     }, 300);
     props.active &&
       props.mobileBehaviour &&
       setTimeout(() => {
-        cubeRef.current?.scrollIntoView({block:"center"})
+        elementRef.current?.scrollIntoView({ block: 'center' });
       }, 300);
   }, []);
 
@@ -113,8 +130,9 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   const handleClick = useCallback(
     (event: SyntheticEvent<HTMLElement>) => {
       // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
-      if(!isActive && props.mobileBehaviour) {
-        cubeRef.current?.scrollIntoView({block:'center'});
+
+      if (!isActive && props.mobileBehaviour) {
+        elementRef.current?.scrollIntoView({ block: 'center' });
         return;
       }
       props.onClickHandler(event);
@@ -124,7 +142,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
 
   return (
     <div
-      ref={ref}
+      ref={elementRef}
       className="relative flex justify-center items-center"
       style={{
         width: cubeProps.containerSize,
@@ -140,7 +158,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         ))}
       </div> */}
       <animated.div
-        ref={cubeRef}
         className="
         relative
         [&>div]:absolute 
