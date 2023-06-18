@@ -28,7 +28,7 @@ require('esbuild').build({
   bundle: true,
   minify: true,
   format: 'esm',
-  target: ['es6'],
+  target: ['es2017'],
   outdir: 'docs',
   splitting: true,
   plugins: [

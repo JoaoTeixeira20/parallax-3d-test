@@ -3,8 +3,6 @@ import {
   useSpring,
   config as springConfig,
   SpringValue,
-  useScroll,
-  AnimationResult,
 } from '@react-spring/web';
 import React, {
   PropsWithChildren,
@@ -32,47 +30,30 @@ type ParallaxSceneProps = PropsWithChildren<{
 const TABLET_BREAKPOINT = 560;
 
 const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
-  useScroll({
-    onChange: (
-      result: AnimationResult<
-        SpringValue<{
-          scrollX: number;
-          scrollXProgress: number;
-          scrollY: number;
-          scrollYProgress: number;
-        }>
-      >
-    ) => {
-      checkCenterIntersection(result.value.scrollY);
-    },
-  });
   const elementRef = useRef<HTMLDivElement>(null);
   const elementCenterPos = useRef({
     left: 0,
     top: 0,
   });
-  const cubeProps = useMemo(
-    () => {
-      const cubeSize = props.containerSize * 0.71;
-      return {
-          containerSize: props.containerSize,
-          cubeSize,
-          springTrebleScaleSize: {
-            start: 0.8,
-            end: 1,
-          },
-          springGainInterpolationSize: {
-            start: (cubeSize / 2) * 0.8,
-            end: (cubeSize / 2) * 1.2,
-          },
-          textSize: cubeSize * 0.15,
-          ringContainerDistance: (cubeSize / 2) * 0.6,
-          outLineRingWidth: cubeSize * 0.1,
-          scrollMarginSize: props.containerSize/2,
-      }
-    },
-    [props.containerSize]
-  );
+  const cubeProps = useMemo(() => {
+    const cubeSize = props.containerSize * 0.71;
+    return {
+      containerSize: props.containerSize,
+      cubeSize,
+      springTrebleScaleSize: {
+        start: 0.8,
+        end: 1,
+      },
+      springGainInterpolationSize: {
+        start: (cubeSize / 2) * 0.8,
+        end: (cubeSize / 2) * 1.2,
+      },
+      textSize: cubeSize * 0.15,
+      ringContainerDistance: (cubeSize / 2) * 0.6,
+      outLineRingWidth: cubeSize * 0.1,
+      scrollMarginSize: props.containerSize / 2,
+    };
+  }, [props.containerSize]);
 
   const [isActive, setIsActive] = useState<boolean | null>(null);
 
@@ -85,11 +66,9 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     config: { ...springConfig.wobbly, clamp: true },
   });
 
-  const checkCenterIntersection = useCallback((scrollY: number) => {
+  const checkCenterIntersection = useCallback(() => {
     Math.abs(
-      scrollY +
-        window.innerHeight / 2 -
-        elementCenterPos.current.top
+      window.scrollY + window.innerHeight / 2 - elementCenterPos.current.top
     ) < cubeProps.scrollMarginSize
       ? setIsActive(true)
       : setIsActive(false);
@@ -102,11 +81,17 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
         top: elementRef.current.offsetTop + cubeProps.containerSize / 2,
       };
     }
-    checkCenterIntersection(window.scrollY);
+    checkCenterIntersection();
     props.active &&
       setTimeout(() => {
         elementRef.current?.scrollIntoView({ block: 'center' });
       }, 300);
+    window.addEventListener('scroll', checkCenterIntersection, {
+      passive: true,
+    });
+    return () => {
+      window.removeEventListener('scroll', checkCenterIntersection);
+    };
   }, []);
 
   const handleClick = useCallback(
