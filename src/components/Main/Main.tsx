@@ -18,7 +18,7 @@ const Main = (props: PropsWithChildren) => {
     >
       <div className="relative flex flex-col justify-start items-center w-full">
         <div className="relative text-center p-3 h-14 w-full"></div>
-        <div className="relative container">{props.children}</div>
+        <div className="relative container h-full">{props.children}</div>
         <div
           style={{
             background: 'rgba(255, 255, 255, 0.16)',

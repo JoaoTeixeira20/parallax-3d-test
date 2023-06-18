@@ -7,7 +7,7 @@ const MenuWrapper = (): ReactElement => {
   const params = useParams();
 
   return (
-    <div className='flex justify-center items-center'>
+    <div className='flex justify-center items-center flex-1'>
       <ParallaxSceneWrapper index={Number(params['id'])} />
     </div>
   );

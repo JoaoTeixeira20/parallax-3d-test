@@ -84,22 +84,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   );
 
   useEffect(() => {
-    if (props.mobileBehaviour) {
-      const scrollTo =
-        Math.abs(
-          props.centerCoords[1] -
-            elementCenterPos.top
-        ) < cubeProps.scrollMarginSize;
-      if (scrollTo) {
-        setIsActive(true);
-        return;
-      }
-      setIsActive(false);
-      return;
-    }
-  }, [props.centerCoords, elementCenterPos]);
-
-  useEffect(() => {
     setTimeout(() => {
       if (elementRef.current) {
         const { top, left, width, height } =
@@ -110,34 +94,23 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         });
       }
     }, 300);
-    props.active &&
-      props.mobileBehaviour &&
-      setTimeout(() => {
-        elementRef.current?.scrollIntoView({ block: 'center' });
-      }, 300);
   }, []);
 
   const handleOver = useCallback(() => {
     props.onMouseOverHandler && props.onMouseOverHandler();
-    !props.mobileBehaviour && setIsActive(true);
+    setIsActive(true);
   }, []);
 
   const handleOverOut = useCallback(() => {
     props.onMouseOutHandler && props.onMouseOutHandler();
-    !props.mobileBehaviour && setIsActive(false);
+    setIsActive(false);
   }, []);
 
   const handleClick = useCallback(
     (event: SyntheticEvent<HTMLElement>) => {
-      // window.scrollTo(0,centerCubeY-(window.innerHeight/2));
-
-      if (!isActive && props.mobileBehaviour) {
-        elementRef.current?.scrollIntoView({ block: 'center' });
-        return;
-      }
       props.onClickHandler(event);
     },
-    [isActive]
+    []
   );
 
   return (
@@ -149,14 +122,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         height: cubeProps.containerSize,
       }}
     >
-      {/* <div className='absolute z-10 pointer-events-none'>
-        {Object.keys(bounds).map((key) => (
-          <div key={key}>
-            <span>{key}</span>
-            <span>{bounds[key]}</span>
-          </div>
-        ))}
-      </div> */}
       <animated.div
         className="
         relative

@@ -15,26 +15,23 @@ const Root = (): ReactElement => {
       opacity: 0,
       // scale: 0,
       transform: 'translate3D(0%, 0%, 0)',
-      filter: 'blur(1px)',
     },
     from: {
       opacity: 0,
       // scale: 0,
       transform: 'translate3D(0%, -100%, 0)',
-      filter: 'blur(1px)',
     },
     enter: {
       opacity: 1,
       // scale: 1,
       transform: 'translate3D(0%, 0%, 0)',
-      filter: 'blur(0px)',
     },
     leave: {
       position: 'absolute',
+      display: 'none',
       opacity: 0,
       // scale: 0,
       transform: 'translate3D(0%, 100%, 0)',
-      filter: 'blur(1px)',
     },
     config: { mass: 1, tension: 130, friction: 17 },
   });
@@ -42,7 +39,7 @@ const Root = (): ReactElement => {
   return (
     <Main>
       {transitions((styles, item) => (
-        <animated.div className="flex flex-col" style={styles}>
+        <animated.div className='min-h-full' style={styles}>
           <Routes location={item.pathname}>
             <Route
               path="/"
