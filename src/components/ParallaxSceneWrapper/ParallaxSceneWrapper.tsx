@@ -52,10 +52,8 @@ const ParallaxSceneWrapper = (
           !isMobileRef.current ? (
             <ParallaxScene
               key={index}
-              active={props.index === index}
               springRef={spring}
               containerSize={DESKTOP_CONTAINER_SIZE}
-              mobileBehaviour={isMobileRef.current}
               onClickHandler={handleClickEvent.bind(null, index)}
             >
               {el}

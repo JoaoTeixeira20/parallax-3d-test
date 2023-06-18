@@ -20,21 +20,19 @@ const DISTANCE = 0;
 const PERSPECTIVE = 600;
 
 type ParallaxSceneProps = PropsWithChildren<{
-  active?: boolean;
   springRef: {
     bassGain: SpringValue<number>;
     trebleGain: SpringValue<number>;
   };
   containerSize: number;
-  mobileBehaviour?: boolean;
   onMouseOverHandler?: () => void;
   onMouseOutHandler?: () => void;
   onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
-  const scrollRef = useRef([0, 0]);
-  const prevMouseCoords = useRef([0, 0]);
+  const scrollRef = useRef([window.scrollX, window.scrollY]);
+  const prevMouseCoords = useRef([window.innerWidth/2, window.innerHeight/2]);
   const elementCenterPos = useRef([0, 0]);
   const elementRef = useRef<HTMLDivElement>(null);
   const cubeProps = useMemo(
