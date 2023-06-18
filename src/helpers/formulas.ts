@@ -3,12 +3,14 @@ export const parallax = (
   y: number,
   originX: number,
   originY: number,
-  maxAngleDeg: number, 
+  maxAngleDeg: number
 ): number[] => {
   //fix for window variable access, since it's client-side we don't have immediate access to the window property
   try {
-    return [Math.max(Math.min(-(y - originY) / 20, maxAngleDeg),-maxAngleDeg),
-      Math.max(Math.min((x - originX) / 20, maxAngleDeg),-maxAngleDeg)];
+    return [
+      Math.max(Math.min(-(y - originY) / 20, maxAngleDeg), -maxAngleDeg),
+      Math.max(Math.min((x - originX) / 20, maxAngleDeg), -maxAngleDeg),
+    ];
   } catch (error) {
     return [0, 0];
   }
@@ -21,10 +23,15 @@ export const rangeConversion = (
   destinationMinValue: number,
   destinationMaxValue: number
 ): number => {
-  const originValue = (originMaxValue - originMinValue)  
-  const destinationValue = (destinationMaxValue - destinationMinValue)  
-  const calculation = (((value - originMinValue) * destinationValue) / originValue) + destinationMinValue
-  return Math.max(Math.min(calculation, destinationMaxValue), destinationMinValue);
+  const originValue = originMaxValue - originMinValue;
+  const destinationValue = destinationMaxValue - destinationMinValue;
+  const calculation =
+    ((value - originMinValue) * destinationValue) / originValue +
+    destinationMinValue;
+  return Math.max(
+    Math.min(calculation, destinationMaxValue),
+    destinationMinValue
+  );
 };
 
 export const debounce = <T extends (...args: any[]) => void>(
@@ -44,4 +51,26 @@ export const asyncGetBoundingClientRect = (
   return new Promise((res) => {
     res(element.getBoundingClientRect());
   });
+};
+
+export const cubeSizeCalculator = (containerSize: number, layout: 'desktop' | 'mobile') => {
+  const cubeSize = containerSize * (layout === 'mobile' ? 0.71 : 0.55);
+  return {
+    containerSize: containerSize,
+    cubeSize,
+    springTrebleScaleSize: {
+      start: 0.8,
+      end: 1,
+    },
+    springGainInterpolationSize: {
+      start: (cubeSize / 2) * 0.8,
+      end: (cubeSize / 2) * 1.2,
+    },
+    textSize: cubeSize * 0.15,
+    ringContainerDistance: (cubeSize / 2) * 0.6,
+    outLineRingWidth: cubeSize * 0.1,
+    originalSize: cubeSize,
+    translateZSize: cubeSize / 2,
+    scrollMarginSize: containerSize / 2,
+  };
 };

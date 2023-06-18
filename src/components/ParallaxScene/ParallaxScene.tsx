@@ -14,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { parallax } from '@/helpers/formulas';
+import { cubeSizeCalculator, parallax } from '@/helpers/formulas';
 
 const DISTANCE = 0;
 const PERSPECTIVE = 600;
@@ -26,7 +26,7 @@ type ParallaxSceneProps = PropsWithChildren<{
     trebleGain: SpringValue<number>;
   };
   centerCoords: number[];
-  cubeSize: number;
+  containerSize: number;
   mobileBehaviour?: boolean;
   onMouseOverHandler?: () => void;
   onMouseOutHandler?: () => void;
@@ -40,20 +40,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     top: 0,
   });
   const cubeProps = useMemo(
-    () => ({
-      containerSize: props.cubeSize * 1.8,
-      originalSize: props.cubeSize,
-      translateZSize: props.cubeSize / 2,
-      springGainInterpolationSize: {
-        start: (props.cubeSize / 2) * 0.8,
-        end: (props.cubeSize / 2) * 1.2,
-      },
-      textSize: props.cubeSize * 0.15,
-      ringContainerDistance: (props.cubeSize / 2) * 0.6,
-      outLineRingWidth: props.cubeSize * 0.1,
-      scrollMarginSize: props.cubeSize * 0.9,
-    }),
-    [props.cubeSize]
+    () => cubeSizeCalculator(props.containerSize, 'desktop'),
+    [props.containerSize]
   );
 
   const [isActive, setIsActive] = useState<boolean | null>(null);

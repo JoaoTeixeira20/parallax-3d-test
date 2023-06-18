@@ -19,28 +19,32 @@ const CardContent = (props: CardContentProps): ReactElement => {
 
   return (
     <div ref={containerRef} className="container relative">
-      <div className='p-14 w-full h-full flex justify-center items-center'>
-      <animated.div
-        className="bg-amber-600 p-4 rounded-3xl"
-        style={{
-          scale: spring.trebleGain.to([0, 1], [1, 1.1]),
-          outlineWidth: spring.bassGain.to([0,1], [10,20]),
-          outlineStyle: 'solid',
-          outlineColor: spring.bassGain.to([0,1],['#aa5b00','#ff0000'])
-        }}
-      >
-        <animated.div className='text-3xl' style={{
-          scale: spring.trebleGain.to([0, 1], [1, 0.9 ]),
-        }}>
-        this is me, in a curious strange state, and i don't know what to do, please help me, im trying to break the matrix
+      <div className="p-14 w-full flex justify-center items-center">
+        <animated.div
+          className="bg-amber-600 p-4 rounded-3xl"
+          style={{
+            scale: spring.trebleGain.to([0, 1], [1, 1.1]),
+            outlineWidth: spring.bassGain.to([0, 1], [10, 20]),
+            outlineStyle: 'solid',
+            outlineColor: spring.bassGain.to([0, 1], ['#aa5b00', '#ff0000']),
+          }}
+        >
+          <animated.div
+            className="text-3xl"
+            style={{
+              scale: spring.trebleGain.to([0, 1], [1, 0.9]),
+            }}
+          >
+            this is me, in a curious strange state, and i don't know what to do,
+            please help me, im trying to break the matrix
+          </animated.div>
         </animated.div>
-      </animated.div>
       </div>
       <div className="sticky top-14 float-left">
         <ParallaxScene
           centerCoords={[0, 0]}
           springRef={spring}
-          cubeSize={100}
+          containerSize={280}
           onClickHandler={handleClick}
         >
           back from {props.index}

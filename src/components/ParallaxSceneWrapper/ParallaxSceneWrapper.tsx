@@ -16,7 +16,8 @@ type ParallaxSceneWrapperProps = {
   index: number;
 };
 
-const CONTAINER_SIZE = 280;
+const MOBILE_CONTAINER_SIZE = 280;
+const DESKTOP_CONTAINER_SIZE = 360;
 
 const ParallaxSceneWrapper = (
   props: ParallaxSceneWrapperProps
@@ -69,8 +70,8 @@ const ParallaxSceneWrapper = (
         ref={wrapperRef}
         style={{
           ...(isMobileRef.current && {
-            paddingTop: window.innerHeight/2-CONTAINER_SIZE,
-            paddingBottom: window.innerHeight/2-CONTAINER_SIZE,
+            paddingTop: window.innerHeight/2-MOBILE_CONTAINER_SIZE*0.9,
+            paddingBottom: window.innerHeight/2-MOBILE_CONTAINER_SIZE*0.9,
           }),
         }}
         className="
@@ -89,7 +90,7 @@ const ParallaxSceneWrapper = (
               active={props.index === index}
               springRef={spring}
               centerCoords={centerPos}
-              cubeSize={200}
+              containerSize={DESKTOP_CONTAINER_SIZE}
               mobileBehaviour={isMobileRef.current}
               onClickHandler={handleClickEvent.bind(null, index)}
             >
@@ -100,7 +101,7 @@ const ParallaxSceneWrapper = (
               key={index}
               active={props.index === index}
               springRef={spring}
-              containerSize={CONTAINER_SIZE}
+              containerSize={MOBILE_CONTAINER_SIZE}
               onClickHandler={handleClickEvent.bind(null, index)}
             >
               {el}

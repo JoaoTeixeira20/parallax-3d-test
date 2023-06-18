@@ -1,3 +1,4 @@
+import { cubeSizeCalculator } from '@/helpers/formulas';
 import {
   animated,
   useSpring,
@@ -35,25 +36,10 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     left: 0,
     top: 0,
   });
-  const cubeProps = useMemo(() => {
-    const cubeSize = props.containerSize * 0.71;
-    return {
-      containerSize: props.containerSize,
-      cubeSize,
-      springTrebleScaleSize: {
-        start: 0.8,
-        end: 1,
-      },
-      springGainInterpolationSize: {
-        start: (cubeSize / 2) * 0.8,
-        end: (cubeSize / 2) * 1.2,
-      },
-      textSize: cubeSize * 0.15,
-      ringContainerDistance: (cubeSize / 2) * 0.6,
-      outLineRingWidth: cubeSize * 0.1,
-      scrollMarginSize: props.containerSize / 2,
-    };
-  }, [props.containerSize]);
+  const cubeProps = useMemo(
+    () => cubeSizeCalculator(props.containerSize, 'mobile'),
+    [props.containerSize]
+  );
 
   const [isActive, setIsActive] = useState<boolean | null>(null);
 
@@ -98,7 +84,6 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     (event: SyntheticEvent<HTMLElement>) => {
       if (!isActive) {
         elementRef.current?.scrollIntoView({ block: 'center' });
-        return;
       }
       props.onClickHandler(event);
     },
