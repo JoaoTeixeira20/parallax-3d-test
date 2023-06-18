@@ -42,7 +42,6 @@ const CardContent = (props: CardContentProps): ReactElement => {
       </div>
       <div className="sticky top-14 float-left">
         <ParallaxScene
-          centerCoords={[0, 0]}
           springRef={spring}
           containerSize={280}
           onClickHandler={handleClick}

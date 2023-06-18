@@ -25,7 +25,6 @@ type ParallaxSceneProps = PropsWithChildren<{
     bassGain: SpringValue<number>;
     trebleGain: SpringValue<number>;
   };
-  centerCoords: number[];
   containerSize: number;
   mobileBehaviour?: boolean;
   onMouseOverHandler?: () => void;
@@ -34,11 +33,10 @@ type ParallaxSceneProps = PropsWithChildren<{
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
+  const scrollRef = useRef([0, 0]);
+  const prevMouseCoords = useRef([0, 0]);
+  const elementCenterPos = useRef([0, 0]);
   const elementRef = useRef<HTMLDivElement>(null);
-  const [elementCenterPos, setElementCenterPos] = useState({
-    left: 0,
-    top: 0,
-  });
   const cubeProps = useMemo(
     () => cubeSizeCalculator(props.containerSize, 'desktop'),
     [props.containerSize]
@@ -46,42 +44,73 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
 
   const [isActive, setIsActive] = useState<boolean | null>(null);
 
-  const parallaxCoords = useMemo(
-    () =>
-      parallax(
-        props.centerCoords[0],
-        props.centerCoords[1],
-        elementCenterPos.left,
-        elementCenterPos.top,
-        45
-      ),
-    [props.centerCoords, elementCenterPos]
-  );
-
-  const spring = useSpring(
+  const [spring, api] = useSpring(
     {
-      rotateX: parallaxCoords[0],
-      rotateY: parallaxCoords[1],
+      rotateX: 0,
+      rotateY: 0,
       backgroundColor: isActive
         ? 'rgba(250, 204, 21,0.9)'
         : 'rgba(250, 204, 21,0.1)',
       scale: isActive ? 1.3 : 1,
       borderRadius: isActive ? '1%' : '50%',
       config: { ...springConfig.wobbly, clamp: true },
-    }
+    },
+    [isActive]
   );
+
+  const handleMouseMove = useCallback((event: MouseEvent) => {
+    prevMouseCoords.current = [event.pageX, event.pageY];
+    const [rotateX, rotateY] = parallax(
+      event.pageX,
+      event.pageY,
+      elementCenterPos.current[0],
+      elementCenterPos.current[1],
+      45
+    );
+    api.start({
+      rotateX,
+      rotateY,
+    });
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const scrollX = window.scrollX - scrollRef.current[0];
+    const scrollY = window.scrollY - scrollRef.current[1];
+    const [rotateX, rotateY] = parallax(
+      scrollX + prevMouseCoords.current[0],
+      scrollY + prevMouseCoords.current[1],
+      elementCenterPos.current[0],
+      elementCenterPos.current[1],
+      45
+    );
+    api.start({
+      rotateX,
+      rotateY,
+    });
+    prevMouseCoords.current = [
+      prevMouseCoords.current[0] + scrollX,
+      prevMouseCoords.current[1] + scrollY,
+    ];
+    scrollRef.current = [window.scrollX, window.scrollY];
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
       if (elementRef.current) {
         const { top, left, width, height } =
           elementRef.current.getBoundingClientRect();
-        setElementCenterPos({
-          left: left + window.scrollX + width / 2,
-          top: top + window.scrollY + height / 2,
-        });
+        elementCenterPos.current = [
+          left + window.scrollX + width / 2,
+          top + window.scrollY + height / 2,
+        ];
       }
     }, 300);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const handleOver = useCallback(() => {
@@ -94,12 +123,9 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
     setIsActive(false);
   }, []);
 
-  const handleClick = useCallback(
-    (event: SyntheticEvent<HTMLElement>) => {
-      props.onClickHandler(event);
-    },
-    []
-  );
+  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
+    props.onClickHandler(event);
+  }, []);
 
   return (
     <div

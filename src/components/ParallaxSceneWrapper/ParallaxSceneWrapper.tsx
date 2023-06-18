@@ -3,9 +3,7 @@ import React, {
   ReactElement,
   useCallback,
   useContext,
-  useEffect,
   useRef,
-  useState,
 } from 'react';
 import ParallaxScene from '../ParallaxScene/ParallaxScene';
 import { useNavigate } from 'react-router-dom';
@@ -26,39 +24,6 @@ const ParallaxSceneWrapper = (
   const { spring, isMobileRef } = useContext(PagesContext);
 
   const navigate = useNavigate();
-
-  const scrollRef = useRef([0,0]);
-  const [centerPos, setCenterPos] = useState<number[]>([
-    window.scrollX + window.innerWidth / 2,
-    window.scrollY + window.innerHeight / 2,
-  ]);
-
-  const handleMouseMove = useCallback((event: MouseEvent) => {
-    setCenterPos([event.pageX, event.pageY]);
-  }, []);
-
-  const handleScroll = useCallback(() => {
-    const scrollX = window.scrollX - scrollRef.current[0];
-    const scrollY = window.scrollY - scrollRef.current[1];
-    setCenterPos(([x, y]) => [x + scrollX, y + scrollY]);
-    scrollRef.current = [window.scrollX, window.scrollY];
-  }, []);
-
-  /* i could opt by using useScroll from react-spring but it would lag the mobile listeners
-   * in this case, the listener is added if it's not a mobile device
-   */
-  useEffect(() => {
-    if(!isMobileRef.current) {
-      window.addEventListener('mousemove', handleMouseMove,{passive:true});
-      window.addEventListener('scroll', handleScroll,{passive:true});
-    }
-    return () => {
-      if(!isMobileRef.current) {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, []);
 
   const handleClickEvent = useCallback((index: number) => {
     navigate(`/cards/${index}`);
@@ -89,7 +54,6 @@ const ParallaxSceneWrapper = (
               key={index}
               active={props.index === index}
               springRef={spring}
-              centerCoords={centerPos}
               containerSize={DESKTOP_CONTAINER_SIZE}
               mobileBehaviour={isMobileRef.current}
               onClickHandler={handleClickEvent.bind(null, index)}
