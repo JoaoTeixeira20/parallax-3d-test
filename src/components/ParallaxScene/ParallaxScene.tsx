@@ -32,7 +32,7 @@ type ParallaxSceneProps = PropsWithChildren<{
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   const scrollRef = useRef([window.scrollX, window.scrollY]);
-  const prevMouseCoords = useRef([window.innerWidth/2, window.innerHeight/2]);
+  const prevMouseCoords = useRef([0, 0]);
   const elementCenterPos = useRef([0, 0]);
   const elementRef = useRef<HTMLDivElement>(null);
   const cubeProps = useMemo(
@@ -93,16 +93,16 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (elementRef.current) {
-        const { top, left, width, height } =
-          elementRef.current.getBoundingClientRect();
-        elementCenterPos.current = [
-          left + window.scrollX + width / 2,
-          top + window.scrollY + height / 2,
-        ];
-      }
-    }, 300);
+    if (elementRef.current) {
+      elementCenterPos.current = [
+        elementRef.current.offsetLeft + cubeProps.containerSize / 2,
+        elementRef.current.offsetTop + cubeProps.containerSize / 2,
+      ];
+    }
+    prevMouseCoords.current = [
+      elementCenterPos.current[0] + scrollRef.current[0],
+      elementCenterPos.current[1] + scrollRef.current[1],
+    ];
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {

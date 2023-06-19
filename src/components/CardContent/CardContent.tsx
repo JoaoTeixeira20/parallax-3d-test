@@ -1,5 +1,5 @@
 import { PagesContext } from '@/context/PagesContext';
-import React, { ReactElement, useContext, useEffect, useRef } from 'react';
+import React, { ReactElement, useContext, useRef } from 'react';
 import ParallaxScene from '../ParallaxScene/ParallaxScene';
 import { useNavigate } from 'react-router';
 import { animated } from '@react-spring/web';
@@ -14,7 +14,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    navigate(`/${props.index}`, { preventScrollReset: false });
+    navigate(`/${props.index}`);
   };
 
   return (
@@ -43,7 +43,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
       <div className="sticky top-14 float-left">
         <ParallaxScene
           springRef={spring}
-          containerSize={280}
+          containerSize={150}
           onClickHandler={handleClick}
         >
           back from {props.index}

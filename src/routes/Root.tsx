@@ -3,7 +3,7 @@ const MenuWrapper = lazy(() => import('@/components/MenuWrapper/MenuWrapper'));
 const CardContentRenderer = lazy(
   () => import('@/components/CardContentRenderer/CardContentRenderer')
 );
-import { animated, useTransition, config as SpringConfig } from '@react-spring/web';
+import { animated, useTransition } from '@react-spring/web';
 import React, { ReactElement, Suspense, lazy } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
@@ -39,7 +39,7 @@ const Root = (): ReactElement => {
   return (
     <Main>
       {transitions((styles, item) => (
-        <animated.div className='min-h-full' style={styles}>
+        <animated.div className="min-h-full" style={styles}>
           <Routes location={item.pathname}>
             <Route
               path="/"

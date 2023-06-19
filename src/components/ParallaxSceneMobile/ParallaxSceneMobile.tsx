@@ -84,6 +84,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     (event: SyntheticEvent<HTMLElement>) => {
       if (!isActive) {
         elementRef.current?.scrollIntoView({ block: 'center' });
+        return;
       }
       props.onClickHandler(event);
     },

@@ -6,8 +6,10 @@ const CardContentRenderer = (): ReactElement => {
   const params = useParams();
 
   useEffect(() => {
-    window.scrollTo(0,0);
-  },[350])
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    },250)
+  }, []);
 
   return (
       <CardContent index={Number(params['id'])} />

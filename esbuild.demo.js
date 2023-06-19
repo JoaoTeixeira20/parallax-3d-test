@@ -24,11 +24,11 @@ function copyFolderSync(source, destination) {
 copyFolderSync('./public/assets','./docs/assets');
 
 require('esbuild').build({
-  entryPoints: ['src/development/Preview.tsx', 'src/development/style.css'],
+  entryPoints: ['src/development/Final.tsx', 'src/development/style.css'],
   bundle: true,
   minify: true,
   format: 'esm',
-  target: ['es2017'],
+  target: ['es6'],
   outdir: 'docs',
   splitting: true,
   plugins: [

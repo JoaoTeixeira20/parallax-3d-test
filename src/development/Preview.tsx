@@ -6,16 +6,16 @@ import Root from '@/routes/Root';
 import { HashRouter } from 'react-router-dom';
 import AudioAnalyser from '@/components/AudioAnalyser/AudioAnalyser';
 
-const App = () => (
-    <ErrorStackTrace>
+const App = () => {
+    return(<ErrorStackTrace>
       {/* <AudioAnalyser/> */}
       <PagesContextProvider>
         <HashRouter>
           <Root />
         </HashRouter>
       </PagesContextProvider>
-    </ErrorStackTrace>  
-);
+    </ErrorStackTrace>)
+};
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') || document.createElement('div')
