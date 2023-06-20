@@ -40,7 +40,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
           </animated.div>
         </animated.div>
       </div>
-      <div className="sticky top-14 float-left">
+      {/* <div className="relative top-14 float-left">
         <ParallaxScene
           springRef={spring}
           containerSize={150}
@@ -48,7 +48,8 @@ const CardContent = (props: CardContentProps): ReactElement => {
         >
           back from {props.index}
         </ParallaxScene>
-      </div>
+      </div> */}
+      <div className='bg-orange-700 text-amber-500 cursor-pointer top-14 flex items-center justify-center sticky h-11' onClick={handleClick}>go back to ${props.index}</div>
       <p>
         hello card content, my index is ${props.index}
         <br />

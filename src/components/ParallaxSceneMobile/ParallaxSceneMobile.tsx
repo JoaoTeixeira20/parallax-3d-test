@@ -61,17 +61,20 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
   }, [cubeProps]);
 
   useEffect(() => {
-    if (elementRef.current) {
-      elementCenterPos.current = {
-        left: elementRef.current.offsetLeft + cubeProps.containerSize / 2,
-        top: elementRef.current.offsetTop + cubeProps.containerSize / 2,
-      };
-    }
-    checkCenterIntersection();
+    setTimeout(() => {
+      if (elementRef.current) {
+        const { left, top } = elementRef.current.getBoundingClientRect();
+        elementCenterPos.current = {
+          left: left + window.scrollX + cubeProps.containerSize / 2,
+          top: top + window.scrollY + cubeProps.containerSize / 2,
+        };
+        checkCenterIntersection();
+      }
+    }, 300);
     props.active &&
       setTimeout(() => {
         elementRef.current?.scrollIntoView({ block: 'center' });
-      }, 300);
+      }, 350);
     window.addEventListener('scroll', checkCenterIntersection, {
       passive: true,
     });

@@ -13,25 +13,25 @@ const Root = (): ReactElement => {
   const transitions = useTransition(location, {
     initial: {
       opacity: 0,
-      // scale: 0,
-      transform: 'translate3D(0%, 0%, 0)',
+      scale: 0,
+      transform: 'translate(0%, 0%)',
     },
     from: {
       opacity: 0,
-      // scale: 0,
-      transform: 'translate3D(0%, -100%, 0)',
+      scale: 0,
+      transform: 'translate(0%, -100%)',
     },
     enter: {
       opacity: 1,
-      // scale: 1,
-      transform: 'translate3D(0%, 0%, 0)',
+      scale: 1,
+      transform: 'translate(0%, 0%)',
     },
     leave: {
       position: 'absolute',
       display: 'none',
       opacity: 0,
-      // scale: 0,
-      transform: 'translate3D(0%, 100%, 0)',
+      scale: 0,
+      transform: 'translate(0%, -100%)',
     },
     config: { mass: 1, tension: 130, friction: 17 },
   });
@@ -39,7 +39,7 @@ const Root = (): ReactElement => {
   return (
     <Main>
       {transitions((styles, item) => (
-        <animated.div className="min-h-full" style={styles}>
+        <animated.div className="min-h-full flex flex-row" style={styles}>
           <Routes location={item.pathname}>
             <Route
               path="/"

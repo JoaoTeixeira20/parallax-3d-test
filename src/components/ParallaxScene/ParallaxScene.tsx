@@ -31,7 +31,7 @@ type ParallaxSceneProps = PropsWithChildren<{
 }>;
 
 const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
-  const scrollRef = useRef([window.scrollX, window.scrollY]);
+  const scrollRef = useRef([0, 0]);
   const prevMouseCoords = useRef([0, 0]);
   const elementCenterPos = useRef([0, 0]);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -74,35 +74,54 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   const handleScroll = useCallback(() => {
     const scrollX = window.scrollX - scrollRef.current[0];
     const scrollY = window.scrollY - scrollRef.current[1];
-    const [rotateX, rotateY] = parallax(
+    prevMouseCoords.current = [
       scrollX + prevMouseCoords.current[0],
       scrollY + prevMouseCoords.current[1],
+    ];
+    const [rotateX, rotateY] = parallax(
+      prevMouseCoords.current[0],
+      prevMouseCoords.current[1],
       elementCenterPos.current[0],
       elementCenterPos.current[1],
       45
     );
+    console.log(prevMouseCoords.current, elementCenterPos.current);
+    scrollRef.current = [window.scrollX, window.scrollY];
     api.start({
       rotateX,
       rotateY,
     });
-    prevMouseCoords.current = [
-      prevMouseCoords.current[0] + scrollX,
-      prevMouseCoords.current[1] + scrollY,
-    ];
-    scrollRef.current = [window.scrollX, window.scrollY];
   }, []);
 
   useEffect(() => {
-    if (elementRef.current) {
-      elementCenterPos.current = [
-        elementRef.current.offsetLeft + cubeProps.containerSize / 2,
-        elementRef.current.offsetTop + cubeProps.containerSize / 2,
+    setTimeout(() => {
+      if (elementRef.current) {
+        const { left, top } = elementRef.current.getBoundingClientRect();
+        elementCenterPos.current = [
+          left + window.scrollX + cubeProps.containerSize / 2,
+          top + window.scrollY + cubeProps.containerSize / 2,
+        ];
+        scrollRef.current = [window.scrollX, window.scrollY];
+      }
+      prevMouseCoords.current = [
+        elementCenterPos.current[0],
+        elementCenterPos.current[1],
       ];
-    }
-    prevMouseCoords.current = [
-      elementCenterPos.current[0] + scrollRef.current[0],
-      elementCenterPos.current[1] + scrollRef.current[1],
-    ];
+      console.log(elementCenterPos.current, window.scrollX, window.scrollY)
+
+      const [rotateX, rotateY] = parallax(
+        prevMouseCoords.current[0],
+        prevMouseCoords.current[1],
+        elementCenterPos.current[0],
+        elementCenterPos.current[1],
+        45
+      );
+      api.start({
+        rotateX,
+        rotateY,
+      });
+    }, 350);
+
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
