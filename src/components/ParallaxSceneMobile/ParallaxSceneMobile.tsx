@@ -70,11 +70,8 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
         };
         checkCenterIntersection();
       }
+      props.active && elementRef.current?.scrollIntoView({ block: 'center' });
     }, 300);
-    props.active &&
-      setTimeout(() => {
-        elementRef.current?.scrollIntoView({ block: 'center' });
-      }, 350);
     window.addEventListener('scroll', checkCenterIntersection, {
       passive: true,
     });
