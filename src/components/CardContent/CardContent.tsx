@@ -1,6 +1,5 @@
 import { PagesContext } from '@/context/PagesContext';
 import React, { ReactElement, useContext, useRef } from 'react';
-import ParallaxScene from '../ParallaxScene/ParallaxScene';
 import { useNavigate } from 'react-router';
 import { animated } from '@react-spring/web';
 
