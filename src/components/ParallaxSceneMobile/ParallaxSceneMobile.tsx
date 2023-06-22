@@ -41,23 +41,41 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     [props.containerSize]
   );
 
-  const [isActive, setIsActive] = useState<boolean | null>(null);
+  const activeRef = useRef<boolean>(false);
 
-  const spring = useSpring({
-    backgroundColor: isActive
-      ? 'rgba(250, 204, 21,0.9)'
-      : 'rgba(250, 204, 21,0.1)',
-    scale: isActive ? 1.3 : 1,
-    borderRadius: isActive ? '1%' : '50%',
-    config: { ...springConfig.wobbly, clamp: true },
-  });
+  const [spring, api] = useSpring(
+    {
+      backgroundColor: 'rgba(250, 204, 21,0.1)',
+      scale: 1,
+      borderRadius: '50%',
+      config: { ...springConfig.wobbly, clamp: true },
+    },
+    []
+  );
 
   const checkCenterIntersection = useCallback(() => {
-    Math.abs(
-      window.scrollY + window.innerHeight / 2 - elementCenterPos.current.top
-    ) < cubeProps.scrollMarginSize
-      ? setIsActive(true)
-      : setIsActive(false);
+    if (
+      Math.abs(
+        window.scrollY + window.innerHeight / 2 - elementCenterPos.current.top
+      ) < cubeProps.scrollMarginSize
+    ) {
+      if (activeRef.current) return
+      window.navigator.vibrate && window.navigator.vibrate([40]);
+      api.start({
+        backgroundColor: 'rgba(250, 204, 21,0.9)',
+        scale: 1.3,
+        borderRadius: '1%',
+      });
+      activeRef.current = true;
+      return;
+    }
+    api.start({
+      backgroundColor: 'rgba(250, 204, 21,0.1)',
+      scale: 1,
+      borderRadius: '50%',
+    });
+    activeRef.current = false;
+    return;
   }, [cubeProps]);
 
   useEffect(() => {
@@ -80,16 +98,13 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     };
   }, []);
 
-  const handleClick = useCallback(
-    (event: SyntheticEvent<HTMLElement>) => {
-      if (!isActive) {
-        elementRef.current?.scrollIntoView({ block: 'center' });
-        return;
-      }
-      props.onClickHandler(event);
-    },
-    [isActive]
-  );
+  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
+    if (!activeRef.current) {
+      elementRef.current?.scrollIntoView({ block: 'center' });
+      return;
+    }
+    props.onClickHandler(event);
+  }, []);
 
   return (
     <div
