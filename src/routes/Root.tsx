@@ -1,3 +1,4 @@
+import LoaderComponent from '@/components/LoaderComponent/LoaderComponent';
 import Main from '@/components/Main/Main';
 const MenuWrapper = lazy(() => import('@/components/MenuWrapper/MenuWrapper'));
 const CardContentRenderer = lazy(
@@ -52,7 +53,7 @@ const Root = (): ReactElement => {
             <Route
               path="/"
               element={
-                <Suspense fallback={<div>loading menu...</div>}>
+                <Suspense fallback={<LoaderComponent/>}>
                   <MenuWrapper />
                 </Suspense>
               }
@@ -60,7 +61,7 @@ const Root = (): ReactElement => {
             <Route
               path="/:id"
               element={
-                <Suspense fallback={<div>loading menu...</div>}>
+                <Suspense fallback={<LoaderComponent/>}>
                   <MenuWrapper />
                 </Suspense>
               }
@@ -68,7 +69,7 @@ const Root = (): ReactElement => {
             <Route
               path="/cards/:id"
               element={
-                <Suspense fallback={<div>loading card...</div>}>
+                <Suspense fallback={<LoaderComponent/>}>
                   <CardContentRenderer />
                 </Suspense>
               }

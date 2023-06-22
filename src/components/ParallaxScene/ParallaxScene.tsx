@@ -85,7 +85,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
       elementCenterPos.current[1],
       45
     );
-    console.log(prevMouseCoords.current, elementCenterPos.current);
     scrollRef.current = [window.scrollX, window.scrollY];
     api.start({
       rotateX,
@@ -107,7 +106,6 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         elementCenterPos.current[0],
         elementCenterPos.current[1],
       ];
-      console.log(elementCenterPos.current, window.scrollX, window.scrollY)
 
       const [rotateX, rotateY] = parallax(
         prevMouseCoords.current[0],
