@@ -20,14 +20,14 @@ const Root = (): ReactElement => {
     initial: {
       gridTemplateRows: '0fr',
       opacity: 0,
-      scale: 0,
+      scale: 0.5,
       translateY: '0%',
     },
     from: {
       gridTemplateRows: '0fr',
       opacity: 0,
-      scale: 0,
-      translateY: '-100%',
+      scale: 0.5,
+      translateY: '-20%',
     },
     enter: {
       gridTemplateRows: '1fr',
@@ -39,8 +39,8 @@ const Root = (): ReactElement => {
       gridTemplateRows: '0fr',
       display: 'none',
       opacity: 0,
-      scale: 0,
-      translateY: '-100%',
+      scale: 0.5,
+      translateY: '-20%',
     },
     config: { mass: 1, tension: 130, friction: 17 },
   });

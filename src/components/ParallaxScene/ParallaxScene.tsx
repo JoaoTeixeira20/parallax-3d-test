@@ -16,8 +16,8 @@ import React, {
 } from 'react';
 import { cubeSizeCalculator, parallax } from '@/helpers/formulas';
 
-const DISTANCE = 0;
-const PERSPECTIVE = 600;
+const DISTANCE = 50;
+const PERSPECTIVE = 500;
 
 type ParallaxSceneProps = PropsWithChildren<{
   springRef: {
@@ -118,7 +118,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         rotateX,
         rotateY,
       });
-    }, 350);
+    }, 300);
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
