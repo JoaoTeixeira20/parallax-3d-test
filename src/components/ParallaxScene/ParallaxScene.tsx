@@ -15,6 +15,7 @@ import React, {
   useState,
 } from 'react';
 import { cubeSizeCalculator, parallax } from '@/helpers/formulas';
+import themeColors from '@/tailwind-theme-colors/tailwind-theme-colors';
 
 const DISTANCE = 50;
 const PERSPECTIVE = 500;
@@ -186,7 +187,8 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           text-zinc-400
           cursor-pointer
           select-none
-          backdrop-blur-sm"
+          backdrop-blur-sm
+          "
           style={{
             translateZ: props.springRef.trebleGain.to(
               [0, 1],
@@ -204,7 +206,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
             ),
             outlineColor: props.springRef.bassGain.to(
               [0, 1],
-              ['rgb(165 243 252)', 'rgb(22 78 99)']
+              [themeColors.neonTheme.outlineInitial, themeColors.neonTheme.outlineFinal]
             ),
             borderRadius: spring.borderRadius,
 

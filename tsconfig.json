@@ -9,7 +9,7 @@
     "declarationDir": "dist",
     "noEmit": true,
     "sourceMap": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "dist",
     "strict": true,
     "noImplicitReturns": true,
@@ -21,9 +21,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"]
     }
   }
 }
