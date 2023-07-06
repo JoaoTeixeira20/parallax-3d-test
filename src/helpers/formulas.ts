@@ -34,6 +34,18 @@ export const rangeConversion = (
   );
 };
 
+export function calculateXPosition(y: number, radius: number) {
+  const xPosition = Math.sqrt(radius * radius - y * y);
+  return xPosition;
+}
+
+export function calculateDistances(angleInDegrees: number, radius: number) {
+  const angleInRadians = angleInDegrees * (Math.PI / 180);
+  const xDistance = radius * Math.cos(angleInRadians);
+  const yDistance = radius * Math.sin(angleInRadians);
+  return { x: xDistance, y: yDistance };
+}
+
 export const debounce = <T extends (...args: any[]) => void>(
   f: T,
   delay: number

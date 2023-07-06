@@ -9,6 +9,7 @@ import React, {
 import { useNavigate } from 'react-router';
 import { animated } from '@react-spring/web';
 import SvgArc from '../svgs/SvgArc';
+import SphereScene from '../SphereScene/ShpereScene';
 
 type CardContentProps = {
   index: number;
@@ -91,14 +92,15 @@ const CardContent = (props: CardContentProps): ReactElement => {
             relative
             text-amber-500
             w-full
-            h-[50px]
+            h-auto
             flex
             ${stuck ? 'text-lg' : 'text-sm'}
             ${stuck ? 'font-bold' : 'font-normal'}
             items-center
             justify-center
+            flex-col
             rounded-sm
-            py-0
+            py-2
             m-0
             opacity-80 px-5`}
           style={{
@@ -106,15 +108,16 @@ const CardContent = (props: CardContentProps): ReactElement => {
               'linear-gradient(90deg, rgba(30,41,59,0) 0%, rgba(30,41,59,1) 25%, rgba(30,41,59,1) 75%, rgba(30,41,59,0) 100%)',
           }}
         >
-          {stuck && (
+          {/* {stuck && (
             <animated.p
               style={{ scaleX: spring.bassGain.to([0, 1], [0.6,1]), rotateY: spring.trebleGain.to([0,1],['0deg','-45deg']) }}
               className="pr-5 font-bold text-3xl"
             >
               &#8592;
             </animated.p>
-          )}
+          )} */}
           <p>go back to ${props.index}</p>
+          <SphereScene sphereDiameter={100}/>
         </div>
         <SvgArc active={stuck} />
         {/* <SvgWave active={stuck}/> */}
