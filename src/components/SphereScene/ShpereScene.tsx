@@ -33,7 +33,7 @@ export default function SphereScene(props: SphereSceneProps) {
     },
     splitSize: props.sphereDiameter / 10,
     radius: props.sphereDiameter / 2,
-    containerSize: props.sphereDiameter * 1.8,
+    containerSize: props.sphereDiameter * 1.5,
     bassWeirdness: (props.sphereDiameter / 2) * 0.8,
     bassZtransform: (props.sphereDiameter / 2) * 0.25,
     bassMinSize: (props.sphereDiameter / 2) * 0.75,
@@ -152,6 +152,7 @@ export default function SphereScene(props: SphereSceneProps) {
                 ? 0
                 : 1;
             }),
+            scale: spring.bassGain.to([0,1],[0.8,1])
           }}
         ></animated.div>
       );

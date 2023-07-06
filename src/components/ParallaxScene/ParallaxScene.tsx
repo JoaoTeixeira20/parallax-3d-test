@@ -3,6 +3,7 @@ import {
   useSpring,
   config as springConfig,
   SpringValue,
+  SpringRef,
 } from '@react-spring/web';
 import React, {
   PropsWithChildren,
@@ -144,12 +145,13 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
   }, []);
 
   return (
-    <div
+    <animated.div
       ref={elementRef}
       className="relative flex justify-center items-center"
       style={{
         width: cubeProps.containerSize,
         height: cubeProps.containerSize,
+        scale: props.springRef.bassGain.to([0,1],[0.9,1])
       }}
     >
       <animated.div
@@ -250,7 +252,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           }}
         ></div>
       </animated.div>
-    </div>
+    </animated.div>
   );
 };
 

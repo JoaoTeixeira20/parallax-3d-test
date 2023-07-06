@@ -117,7 +117,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
             </animated.p>
           )} */}
           <p>go back to ${props.index}</p>
-          <SphereScene sphereDiameter={100}/>
+          <SphereScene sphereDiameter={200}/>
         </div>
         <SvgArc active={stuck} />
         {/* <SvgWave active={stuck}/> */}

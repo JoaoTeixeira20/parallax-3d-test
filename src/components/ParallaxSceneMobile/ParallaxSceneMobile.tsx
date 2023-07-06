@@ -58,7 +58,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
         window.scrollY + window.innerHeight / 2 - elementCenterPos.current.top
       ) < cubeProps.scrollMarginSize
     ) {
-      if (activeRef.current) return
+      if (activeRef.current) return;
       window.navigator.vibrate && window.navigator.vibrate([40]);
       api.start({
         backgroundColor: 'rgba(250, 204, 21,0.9)',
@@ -106,7 +106,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
   }, []);
 
   return (
-    <div
+    <animated.div
       ref={elementRef}
       className="
         relative
@@ -117,6 +117,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
       style={{
         minWidth: cubeProps.containerSize,
         minHeight: cubeProps.containerSize,
+        scale: props.springRef.bassGain.to([0, 1], [0.9, 1]),
       }}
     >
       <animated.div
@@ -178,7 +179,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
           {props.children}
         </animated.div>
       </animated.div>
-    </div>
+    </animated.div>
   );
 };
 
