@@ -19,6 +19,7 @@ const Main = (props: PropsWithChildren) => {
               `radial-gradient(circle, ${themeColors.neonTheme.backgroundRadial} ${80}%, transparent ${90}%)`,
             ]
           ),
+          willChange: 'background',
         }}
       ></animated.div>
       <div

@@ -118,6 +118,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
         minWidth: cubeProps.containerSize,
         minHeight: cubeProps.containerSize,
         scale: props.springRef.bassGain.to([0, 1], [0.9, 1]),
+        willChange: 'transform',
       }}
     >
       <animated.div
@@ -174,6 +175,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
             borderRadius: spring.borderRadius,
             textShadow:
               '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
+            willChange: 'transform, outline-width, outline-color, border-radius',
           }}
         >
           {props.children}

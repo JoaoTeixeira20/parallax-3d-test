@@ -152,7 +152,8 @@ export default function SphereScene(props: SphereSceneProps) {
                 ? 0
                 : 1;
             }),
-            scale: spring.bassGain.to([0,1],[0.8,1])
+            scale: spring.bassGain.to([0,1],[0.8,1]),
+            willChange: 'transform, opacity',
           }}
         ></animated.div>
       );
@@ -182,6 +183,7 @@ export default function SphereScene(props: SphereSceneProps) {
           rotateX: mouseSpring.rotateX,
           rotateY: mouseSpring.rotateY,
           translate3d: ['0%', '0%', 50],
+          willChange: 'transform'
         }}
       >
         {initializeSphere()}
@@ -202,6 +204,7 @@ export default function SphereScene(props: SphereSceneProps) {
                 sphereProps.poles.final
               )
             ),
+            willChange: 'transform',
           }}
         >
           <animated.div
@@ -265,6 +268,7 @@ export default function SphereScene(props: SphereSceneProps) {
               translateZ: spring.bassGain.to((value) =>
                 rangeConversion(value, 0, 1, 0, sphereProps.bassZtransform)
               ),
+              willChange: 'width, height, transform'
             }}
           >
             <animated.div
@@ -282,6 +286,7 @@ export default function SphereScene(props: SphereSceneProps) {
                     sphereProps.bassInnerDotScale.final,
                   ]
                 ),
+                willChange: 'transform',
               }}
             ></animated.div>
           </animated.div>
