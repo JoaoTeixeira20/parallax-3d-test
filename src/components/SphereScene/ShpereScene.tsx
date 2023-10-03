@@ -115,7 +115,7 @@ export default function SphereScene(props: SphereSceneProps) {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
     };
-  });
+  },[]);
 
   const initializeSphere = () => {
     const elements = [];
