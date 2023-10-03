@@ -1,11 +1,12 @@
 import LoaderComponent from '@/components/LoaderComponent/LoaderComponent';
 import Main from '@/components/Main/Main';
-const MenuWrapper = lazy(() => import('@/components/MenuWrapper/MenuWrapper'));
-const CardContentRenderer = lazy(
+import lazyWithPreload from '@/hocs/LazyWithPreload';
+const MenuWrapper = lazyWithPreload(() => import('@/components/MenuWrapper/MenuWrapper'));
+const CardContentRenderer = lazyWithPreload(
   () => import('@/components/CardContentRenderer/CardContentRenderer')
 );
 import { animated, useTransition } from '@react-spring/web';
-import React, { ReactElement, Suspense, lazy, useEffect, useRef } from 'react';
+import React, { ReactElement, Suspense, useEffect, useRef } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 const Root = (): ReactElement => {
@@ -14,6 +15,8 @@ const Root = (): ReactElement => {
 
   useEffect(() => {
     window.scrollTo({top: 0, left: 0, behavior: 'instant'});
+    MenuWrapper.preload();
+    CardContentRenderer.preload();
   },[location])
 
   const transitions = useTransition(location, {

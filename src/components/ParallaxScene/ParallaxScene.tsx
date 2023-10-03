@@ -3,7 +3,6 @@ import {
   useSpring,
   config as springConfig,
   SpringValue,
-  SpringRef,
 } from '@react-spring/web';
 import React, {
   PropsWithChildren,

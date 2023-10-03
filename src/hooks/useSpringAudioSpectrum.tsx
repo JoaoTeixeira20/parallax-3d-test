@@ -84,17 +84,31 @@ const useSpringAudioSpectrum = (
       bassAnalyser.getByteFrequencyData(bassDataArray);
       trebleAnalyser.getByteFrequencyData(trebleDataArray);
 
-      const normalizedBassAverage =
-        bassDataArray.reduce((sum, value) => sum + value, 0) /
-        bassDataArray.length /
-        255;
+      // const normalizedBassAverage =
+      //   bassDataArray.reduce((sum, value) => sum + value, 0) /
+      //   bassDataArray.length /
+      //   255;
 
-      const normalizedTrebleAverage =
-        trebleDataArray.reduce((sum, value) => sum + value, 0) /
-        trebleDataArray.length /
-        255;
+      // const normalizedTrebleAverage =
+      //   trebleDataArray.reduce((sum, value) => sum + value, 0) /
+      //   trebleDataArray.length /
+      //   255;
 
       // console.log(`bass: ${normalizedBassAverage} treble: ${normalizedTrebleAverage}`)
+
+      let normalizedBassAverage = 0;
+      let normalizedTrebleAverage = 0;
+
+      for (let x of bassDataArray) {
+        normalizedBassAverage += x;
+      }
+
+      for (let y of trebleDataArray) {
+        normalizedTrebleAverage += y;
+      }
+
+      normalizedBassAverage = normalizedBassAverage / bassDataArray.length / 255;
+      normalizedTrebleAverage = normalizedTrebleAverage / trebleDataArray.length / 255;
 
       //bass values vary between .15 and .21 from the filter
       api.set({
@@ -190,7 +204,7 @@ const useSpringAudioSpectrum = (
 
       if (audioRef.current) {
         audioRef.current.removeEventListener('play', startAudioContext);
-        audioRef.current.addEventListener('pause', stopAudioContext);
+        audioRef.current.removeEventListener('pause', stopAudioContext);
       }
     };
   }, []);

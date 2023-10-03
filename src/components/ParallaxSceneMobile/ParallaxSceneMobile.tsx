@@ -10,7 +10,7 @@ import React, {
   ReactElement,
   SyntheticEvent,
   useCallback,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
 } from 'react';
@@ -27,7 +27,7 @@ type ParallaxSceneProps = PropsWithChildren<{
   onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
 }>;
 
-const TABLET_BREAKPOINT = 560;
+// const TABLET_BREAKPOINT = 560;
 
 const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
     return;
   }, [cubeProps]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setTimeout(() => {
       if (elementRef.current) {
         const { left, top } = elementRef.current.getBoundingClientRect();

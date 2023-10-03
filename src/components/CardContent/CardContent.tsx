@@ -1,13 +1,10 @@
-import { PagesContext } from '@/context/PagesContext';
 import React, {
   ReactElement,
-  useContext,
   useEffect,
   useRef,
   useState,
 } from 'react';
 import { useNavigate } from 'react-router';
-import { animated } from '@react-spring/web';
 import SvgArc from '../svgs/SvgArc';
 import SphereScene from '../SphereScene/ShpereScene';
 
@@ -17,7 +14,6 @@ type CardContentProps = {
 
 const CardContent = (props: CardContentProps): ReactElement => {
   const stickyElementRef = useRef<HTMLDivElement>(null);
-  const { spring } = useContext(PagesContext);
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState<boolean>(false);
@@ -55,7 +51,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
   return (
     <div ref={containerRef} className="container relative">
       <div className="p-14 w-full flex justify-center items-center">
-        <animated.div
+        {/* <animated.div
           className="bg-amber-600 p-4 rounded-3xl"
           style={{
             scale: spring.trebleGain.to([0, 1], [1, 1.1]),
@@ -73,7 +69,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
             this is me, in a curious strange state, and i don't know what to do,
             please help me, im trying to break the matrix
           </animated.div>
-        </animated.div>
+        </animated.div> */}
       </div>
       <div ref={stickyElementRef}></div>
       <div
@@ -117,7 +113,7 @@ const CardContent = (props: CardContentProps): ReactElement => {
             </animated.p>
           )} */}
           <p>go back to ${props.index}</p>
-          <SphereScene sphereDiameter={200}/>
+          <SphereScene sphereDiameter={50}/>
         </div>
         <SvgArc active={stuck} />
         {/* <SvgWave active={stuck}/> */}

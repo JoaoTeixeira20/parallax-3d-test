@@ -182,7 +182,7 @@ export default function SphereScene(props: SphereSceneProps) {
           perspective: 500,
           rotateX: mouseSpring.rotateX,
           rotateY: mouseSpring.rotateY,
-          translate3d: ['0%', '0%', 50],
+          translate3d: ['0%', '0%', 0],
           willChange: 'transform'
         }}
       >
@@ -268,7 +268,7 @@ export default function SphereScene(props: SphereSceneProps) {
               translateZ: spring.bassGain.to((value) =>
                 rangeConversion(value, 0, 1, 0, sphereProps.bassZtransform)
               ),
-              willChange: 'width, height, transform'
+              willChange: 'width, height, outline, transform'
             }}
           >
             <animated.div

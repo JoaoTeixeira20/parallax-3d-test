@@ -1,3 +1,3 @@
-import GlobalStyle from 'GlobalStyles';
+// import GlobalStyle from 'GlobalStyles';
 
-export { GlobalStyle };
+// export { GlobalStyle };
