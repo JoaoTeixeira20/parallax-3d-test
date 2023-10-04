@@ -12,14 +12,27 @@ const Main = (props: PropsWithChildren) => {
       <animated.div
         className="fixed left-0 top-0 w-screen h-screen bg-contain"
         style={{
-          background: spring.trebleGain.to(
-            [0, 1],
-            [
-              `radial-gradient(circle, ${themeColors.neonTheme.backgroundRadial} ${0}%, transparent ${10}%)`,
-              `radial-gradient(circle, ${themeColors.neonTheme.backgroundRadial} ${80}%, transparent ${90}%)`,
-            ]
-          ),
-          willChange: 'background',
+          // background: spring.trebleGain.to(
+          //   [0, 1],
+          //   [
+          //     `radial-gradient(circle, ${themeColors.neonTheme.backgroundRadial} ${0}%, transparent ${10}%)`,
+          //     `radial-gradient(circle, ${themeColors.neonTheme.backgroundRadial} ${80}%, transparent ${90}%)`,
+          //   ]
+          // ),
+          background: "white",
+          // background: 'radial-gradient(circle, white 50%, transparent 80%)',
+          filter: "blur(50px)",
+          border: "1px solid blue",
+          borderRadius: "32% 58% 69% 43% / 48% 32% 59% 55%",
+          width: "100%",
+          height: "100%",
+          left: "50%",
+          top: "50%",
+          translateX: "-50%",
+          translateY: "-50%",
+          scale: spring.trebleGain.to([0,1],[0,1]),
+          rotate: spring.bassGain.to([0.2,1],['0deg','180deg']),
+          willChange: 'transform',
         }}
       ></animated.div>
       <div

@@ -1,31 +1,43 @@
-import { lazy, ComponentType, createElement } from 'react';
+import { ComponentType, createElement, forwardRef, lazy, useRef } from "react";
 
 export type PreloadableComponent<T extends ComponentType<any>> = T & {
-  preload: () => Promise<void>;
+    preload: () => Promise<T>;
 };
 
-const lazyWithPreload = <T extends ComponentType<any>>(
-  factory: () => Promise<{ default: T }>
-) => {
-  let LoadedComponent: T | undefined;
-  let factoryPromise: Promise<void> | undefined;
+export function lazyWithPreload<T extends ComponentType<any>>(
+    factory: () => Promise<{ default: T }>
+): PreloadableComponent<T> {
+    const ReactLazyComponent = lazy(factory);
+    let PreloadedComponent: T | undefined;
+    let factoryPromise: Promise<T> | undefined;
 
-  const LazyComponent = lazy(factory);
-
-  const loadComponent = () =>
-    factory().then(module => {
-      LoadedComponent = module.default;
+    const Component = forwardRef(function LazyWithPreload(props, ref) {
+        // Once one of these is chosen, we must ensure that it continues to be
+        // used for all subsequent renders, otherwise it can cause the
+        // underlying component to be unmounted and remounted.
+        const ComponentToRender = useRef(
+            PreloadedComponent ?? ReactLazyComponent
+        );
+        return createElement(
+            ComponentToRender.current,
+            Object.assign(ref ? { ref } : {}, props) as any
+        );
     });
 
-  const Component = (props =>
-    createElement(
-      LoadedComponent || LazyComponent,
-      props
-    )) as PreloadableComponent<T>;
+    const LazyWithPreload = Component as any as PreloadableComponent<T>;
 
-  Component.preload = () => factoryPromise || loadComponent();
+    LazyWithPreload.preload = () => {
+        if (!factoryPromise) {
+            factoryPromise = factory().then((module) => {
+                PreloadedComponent = module.default;
+                return PreloadedComponent;
+            });
+        }
 
-  return Component;
-};
+        return factoryPromise;
+    };
+
+    return LazyWithPreload;
+}
 
 export default lazyWithPreload;

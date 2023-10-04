@@ -1,7 +1,9 @@
 import LoaderComponent from '@/components/LoaderComponent/LoaderComponent';
 import Main from '@/components/Main/Main';
 import lazyWithPreload from '@/hocs/LazyWithPreload';
-const MenuWrapper = lazyWithPreload(() => import('@/components/MenuWrapper/MenuWrapper'));
+const MenuWrapper = lazyWithPreload(
+  () => import('@/components/MenuWrapper/MenuWrapper')
+);
 const CardContentRenderer = lazyWithPreload(
   () => import('@/components/CardContentRenderer/CardContentRenderer')
 );
@@ -14,10 +16,13 @@ const Root = (): ReactElement => {
   const routeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    window.scrollTo({top: 0, left: 0, behavior: 'instant'});
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [location]);
+
+  useEffect(() => {
     MenuWrapper.preload();
     CardContentRenderer.preload();
-  },[location])
+  }, []);
 
   const transitions = useTransition(location, {
     initial: {
@@ -50,36 +55,21 @@ const Root = (): ReactElement => {
 
   return (
     <Main>
-      {transitions((styles, item) => (
-        <animated.div ref={routeContainerRef} className={`min-h-full grid`} style={styles}>
-          <Routes location={item.pathname}>
-            <Route
-              path="/"
-              element={
-                <Suspense fallback={<LoaderComponent/>}>
-                  <MenuWrapper />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/:id"
-              element={
-                <Suspense fallback={<LoaderComponent/>}>
-                  <MenuWrapper />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/cards/:id"
-              element={
-                <Suspense fallback={<LoaderComponent/>}>
-                  <CardContentRenderer />
-                </Suspense>
-              }
-            />
-          </Routes>
-        </animated.div>
-      ))}
+      <Suspense fallback={<LoaderComponent />}>
+        {transitions((styles, item) => (
+          <animated.div
+            ref={routeContainerRef}
+            className={`min-h-full grid`}
+            style={styles}
+          >
+            <Routes location={item.pathname}>
+              <Route path="/" element={<MenuWrapper />} />
+              <Route path="/:id" element={<MenuWrapper />} />
+              <Route path="/cards/:id" element={<CardContentRenderer />} />
+            </Routes>
+          </animated.div>
+        ))}
+      </Suspense>
     </Main>
   );
 };
