@@ -51,7 +51,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
         ? 'rgba(250, 204, 21,0.9)'
         : 'rgba(250, 204, 21,0.1)',
       scale: isActive ? 1.3 : 1,
-      borderRadius: isActive ? '1%' : '50%',
+      borderRadius: isActive ? '5px' : '50%',
       config: { ...springConfig.wobbly, clamp: true },
     },
     [isActive]
@@ -150,7 +150,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
       style={{
         width: cubeProps.containerSize,
         height: cubeProps.containerSize,
-        scale: props.springRef.bassGain.to([0,1],[0.9,1])
+        scale: props.springRef.bassGain.to([0, 1], [0.9, 1]),
       }}
     >
       <animated.div
@@ -183,12 +183,10 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
           items-center
           text
           font-bold
-          outline
           border-none
           text-zinc-400
           cursor-pointer
           select-none
-          backdrop-blur-sm
           "
           style={{
             translateZ: props.springRef.trebleGain.to(
@@ -198,24 +196,44 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
                 cubeProps.springGainInterpolationSize.end,
               ]
             ),
-            scale: 0.85,
+            // scale: 0.85,
+            scale: props.springRef.bassGain.to([0,1],[0.85,1]),
             fontSize: cubeProps.textSize,
-            backgroundColor: spring.backgroundColor,
-            outlineWidth: props.springRef.bassGain.to(
-              [0, 1],
-              [cubeProps.outLineRingWidth / 2, cubeProps.outLineRingWidth * 1.2]
-            ),
-            outlineColor: props.springRef.bassGain.to(
-              [0, 1],
-              [themeColors.neonTheme.outlineInitial, themeColors.neonTheme.outlineFinal]
-            ),
+            // backgroundColor: spring.backgroundColor,
+            // outlineWidth: props.springRef.bassGain.to(
+            //   [0, 1],
+            //   [cubeProps.outLineRingWidth / 2, cubeProps.outLineRingWidth * 1.2]
+            // ),
+            // outlineColor: themeColors.neonTheme.outlineFinal,
+            opacity: props.springRef.bassGain.to([0, 1], [0.4, 0.9]),
             borderRadius: spring.borderRadius,
 
             textShadow:
               '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
+            willChange: 'transform, opacity',
           }}
         >
-          {props.children}
+        </animated.div>
+        <animated.div className='absolute flex justify-center items-center font-bold text-zinc-400 pointer-events-none border-none' style={{
+          translateZ: props.springRef.trebleGain.to(
+            [0, 1],
+            [
+              cubeProps.springGainInterpolationSize.start,
+              cubeProps.springGainInterpolationSize.end,
+            ]
+          ),
+          // scale: props.springRef.bassGain.to([0,1],[0.7,0.8]),
+          scale:0.8,
+          borderRadius: spring.borderRadius,
+          fontSize: cubeProps.textSize,
+          backgroundColor: spring.backgroundColor,
+          // outlineWidth: cubeProps.outLineRingWidth / 2,
+          // outlineColor: 'transparent',
+          textShadow:
+              '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
+          willChange: 'transform',
+        }}>
+        {props.children}
         </animated.div>
         <div
           className="border-none"

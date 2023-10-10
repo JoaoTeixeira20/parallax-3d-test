@@ -35,7 +35,8 @@ const Main = (props: PropsWithChildren) => {
           translateY: '-50%',
           scale: spring.trebleGain.to([0, 1], [0, 1.5]),
           skew: spring.bassGain.to([0, 1], ['0deg', '180deg']),
-          boxShadow: `inset 0px 0px 100px 50px ${themeColors.neonTheme.outlineInitial}`,
+          boxShadow: `inset 0px 0px 200px 100px ${themeColors.neonTheme.outlineInitial}`,
+          opacity: 0.5,
           willChange: 'transform',
         }}
       ></animated.div>

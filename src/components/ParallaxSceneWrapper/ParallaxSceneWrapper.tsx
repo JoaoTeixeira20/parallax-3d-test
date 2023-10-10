@@ -1,10 +1,5 @@
 import { PagesContext } from '@/context/PagesContext';
-import React, {
-  ReactElement,
-  useCallback,
-  useContext,
-  useRef,
-} from 'react';
+import React, { ReactElement, useCallback, useContext, useRef } from 'react';
 import ParallaxScene from '../ParallaxScene/ParallaxScene';
 import { useNavigate } from 'react-router-dom';
 import { items } from '@/content/items';
@@ -35,8 +30,8 @@ const ParallaxSceneWrapper = (
         ref={wrapperRef}
         style={{
           ...(isMobileRef.current && {
-            paddingTop: window.innerHeight/2-MOBILE_CONTAINER_SIZE*0.9,
-            paddingBottom: window.innerHeight/2-MOBILE_CONTAINER_SIZE*0.9,
+            paddingTop: window.innerHeight / 2 - MOBILE_CONTAINER_SIZE * 0.9,
+            paddingBottom: window.innerHeight / 2 - MOBILE_CONTAINER_SIZE * 0.9,
           }),
         }}
         className="
