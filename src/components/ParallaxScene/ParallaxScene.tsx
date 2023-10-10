@@ -29,9 +29,13 @@ type ParallaxSceneProps = PropsWithChildren<{
   onMouseOverHandler?: () => void;
   onMouseOutHandler?: () => void;
   onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
+  invertedBass?: boolean;
 }>;
 
-const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
+const ParallaxScene = ({
+  invertedBass = true,
+  ...props
+}: ParallaxSceneProps): ReactElement => {
   const scrollRef = useRef([0, 0]);
   const prevMouseCoords = useRef([0, 0]);
   const elementCenterPos = useRef([0, 0]);
@@ -197,7 +201,7 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
               ]
             ),
             // scale: 0.85,
-            scale: props.springRef.bassGain.to([0,1],[0.85,1]),
+            scale: !invertedBass ? props.springRef.bassGain.to([0, 1], cubeProps.bassScale) : cubeProps.bassScale[1], 
             fontSize: cubeProps.textSize,
             // backgroundColor: spring.backgroundColor,
             // outlineWidth: props.springRef.bassGain.to(
@@ -205,35 +209,37 @@ const ParallaxScene = (props: ParallaxSceneProps): ReactElement => {
             //   [cubeProps.outLineRingWidth / 2, cubeProps.outLineRingWidth * 1.2]
             // ),
             // outlineColor: themeColors.neonTheme.outlineFinal,
-            opacity: props.springRef.bassGain.to([0, 1], [0.4, 0.9]),
+            opacity: props.springRef.bassGain.to([0, 1], !invertedBass ? cubeProps.bassOpacity : cubeProps.bassOpacity.reverse()),
             borderRadius: spring.borderRadius,
 
             textShadow:
               '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
             willChange: 'transform, opacity',
           }}
-        >
-        </animated.div>
-        <animated.div className='absolute flex justify-center items-center font-bold text-zinc-400 pointer-events-none border-none' style={{
-          translateZ: props.springRef.trebleGain.to(
-            [0, 1],
-            [
-              cubeProps.springGainInterpolationSize.start,
-              cubeProps.springGainInterpolationSize.end,
-            ]
-          ),
-          // scale: props.springRef.bassGain.to([0,1],[0.7,0.8]),
-          scale:0.8,
-          borderRadius: spring.borderRadius,
-          fontSize: cubeProps.textSize,
-          backgroundColor: spring.backgroundColor,
-          // outlineWidth: cubeProps.outLineRingWidth / 2,
-          // outlineColor: 'transparent',
-          textShadow:
+        ></animated.div>
+        <animated.div
+          className="absolute flex justify-center items-center font-bold text-zinc-400 pointer-events-none border-none"
+          style={{
+            translateZ: props.springRef.trebleGain.to(
+              [0, 1],
+              [
+                cubeProps.springGainInterpolationSize.start,
+                cubeProps.springGainInterpolationSize.end,
+              ]
+            ),
+            // scale: props.springRef.bassGain.to([0,1],[0.7,0.8]),
+            scale: !invertedBass ? 0.8 : props.springRef.bassGain.to([0,1],cubeProps.bassScale),
+            borderRadius: spring.borderRadius,
+            fontSize: cubeProps.textSize,
+            backgroundColor: spring.backgroundColor,
+            // outlineWidth: cubeProps.outLineRingWidth / 2,
+            // outlineColor: 'transparent',
+            textShadow:
               '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
-          willChange: 'transform',
-        }}>
-        {props.children}
+            willChange: 'transform',
+          }}
+        >
+          {props.children}
         </animated.div>
         <div
           className="border-none"

@@ -65,11 +65,16 @@ export const asyncGetBoundingClientRect = (
   });
 };
 
-export const cubeSizeCalculator = (containerSize: number, layout: 'desktop' | 'mobile') => {
+export const cubeSizeCalculator = (
+  containerSize: number,
+  layout: 'desktop' | 'mobile'
+) => {
   const cubeSize = containerSize * (layout === 'mobile' ? 0.71 : 0.55);
   return {
     containerSize: containerSize,
     cubeSize,
+    bassScale: [0.85, 1],
+    bassOpacity: [0.4, 0.7],
     springTrebleScaleSize: {
       start: 0.8,
       end: 1,
