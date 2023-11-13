@@ -1,3 +1,6 @@
+const DISTANCE = 50;
+const PERSPECTIVE = 500;
+
 export const parallax = (
   x: number,
   y: number,
@@ -65,23 +68,46 @@ export const asyncGetBoundingClientRect = (
   });
 };
 
+export type cubSizeProps = {
+  containerSize: number,
+  cubeSize: number,
+  bassScale: number[],
+  bassOpacity: number[],
+  springTrebleScaleSize: {
+    start: number,
+    end: number,
+  },
+  springGainInterpolationSize: {
+    start: number,
+    end: number,
+  },
+  textSize: number,
+  ringContainerDistance: number,
+  outLineRingWidth: number,
+  originalSize: number,
+  translateZSize: number,
+  scrollMarginSize: number,
+  distance: number,
+  perspective: number,
+}
+
 export const cubeSizeCalculator = (
   containerSize: number,
   layout: 'desktop' | 'mobile'
-) => {
+): cubSizeProps => {
   const cubeSize = containerSize * (layout === 'mobile' ? 0.71 : 0.55);
   return {
     containerSize: containerSize,
     cubeSize,
-    bassScale: [0.85, 1],
+    bassScale: [0.80, 0.95],
     bassOpacity: [0.4, 0.7],
     springTrebleScaleSize: {
       start: 0.8,
       end: 1,
     },
     springGainInterpolationSize: {
-      start: (cubeSize / 2) * 0.8,
-      end: (cubeSize / 2) * 1.2,
+      start: (cubeSize / 2) * 1,
+      end: (cubeSize / 2) * 1.4,
     },
     textSize: cubeSize * 0.15,
     ringContainerDistance: (cubeSize / 2) * 0.6,
@@ -89,5 +115,7 @@ export const cubeSizeCalculator = (
     originalSize: cubeSize,
     translateZSize: cubeSize / 2,
     scrollMarginSize: containerSize / 2,
+    distance: DISTANCE,
+    perspective: PERSPECTIVE,
   };
 };

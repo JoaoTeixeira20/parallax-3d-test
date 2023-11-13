@@ -3,7 +3,6 @@ import React, { ReactElement, useCallback, useContext, useRef } from 'react';
 import ParallaxScene from '../ParallaxScene/ParallaxScene';
 import { useNavigate } from 'react-router-dom';
 import { items } from '@/content/items';
-import ParallaxSceneMobile from '../ParallaxSceneMobile/ParallaxSceneMobile';
 
 type ParallaxSceneWrapperProps = {
   index: number;
@@ -44,25 +43,17 @@ const ParallaxSceneWrapper = (
           "
       >
         {items.map((el, index) =>
-          !isMobileRef.current ? (
+          (
             <ParallaxScene
-              key={index}
-              springRef={spring}
-              containerSize={DESKTOP_CONTAINER_SIZE}
-              onClickHandler={handleClickEvent.bind(null, index)}
-            >
-              {el}
-            </ParallaxScene>
-          ) : (
-            <ParallaxSceneMobile
               key={index}
               active={props.index === index}
               springRef={spring}
-              containerSize={MOBILE_CONTAINER_SIZE}
+              containerSize={isMobileRef.current ? MOBILE_CONTAINER_SIZE : DESKTOP_CONTAINER_SIZE}
               onClickHandler={handleClickEvent.bind(null, index)}
+              isMobile={isMobileRef.current}
             >
               {el}
-            </ParallaxSceneMobile>
+            </ParallaxScene>
           )
         )}
       </div>

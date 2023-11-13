@@ -156,7 +156,6 @@ const ParallaxSceneMobile = (props: ParallaxSceneProps): ReactElement => {
           h-full"
           style={{
             fontSize: cubeProps.textSize,
-            backgroundColor: spring.backgroundColor,
             scale: props.springRef.trebleGain.to(
               [0, 1],
               [

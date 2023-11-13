@@ -8,7 +8,8 @@ export const colors = {
     backgroundRadial: '#FFFFFF',
     outlineInitial: 'rgb(165 243 252)',
     outlineFinal: 'rgb(22 78 99)',
-    cubeColor: 'rgb(212,212,212)'
+    cubeColor: 'rgb(212,212,212)',
+    innerCubeColor: 'rgb(250,204,21)',
   },
   swissTheme: {
     text: 'rgb(104,104,104)',
@@ -17,7 +18,8 @@ export const colors = {
     backgroundRadial: '#FFFFFF',
     outlineInitial: 'rgb(165 243 252)',
     outlineFinal: 'rgb(22 78 99)',
-    cubeColor: 'rgb(212,212,212)'
+    cubeColor: 'rgb(212,212,212)',
+    innerCubeColor: 'rgb(250,204,21)',
   },
 };
 

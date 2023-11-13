@@ -1,281 +1,103 @@
-import {
-  animated,
-  useSpring,
-  config as springConfig,
-  SpringValue,
-} from '@react-spring/web';
+import { useSpring, config as springConfig } from '@react-spring/web';
 import React, {
-  PropsWithChildren,
   ReactElement,
-  SyntheticEvent,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
-import { cubeSizeCalculator, parallax } from '@/helpers/formulas';
-import themeColors from '@/tailwind-theme-colors/tailwind-theme-colors';
-
-const DISTANCE = 50;
-const PERSPECTIVE = 500;
-
-type ParallaxSceneProps = PropsWithChildren<{
-  springRef: {
-    bassGain: SpringValue<number>;
-    trebleGain: SpringValue<number>;
-  };
-  containerSize: number;
-  onMouseOverHandler?: () => void;
-  onMouseOutHandler?: () => void;
-  onClickHandler: (event: SyntheticEvent<HTMLElement>) => void;
-  invertedBass?: boolean;
-}>;
+import { cubeSizeCalculator } from '@/helpers/formulas';
+import {
+  ParallaxSceneContainerProps,
+  ParallaxSceneProps,
+  ParallaxSceneSrpingProps,
+} from './parallaxSceneType';
+import ParallaxSceneDesktop from './ParallaxSceneDesktop';
+import ParallaxSceneMobile from './ParallaxSceneMobile';
 
 const ParallaxScene = ({
-  invertedBass = true,
+  invertedBass = false,
   ...props
 }: ParallaxSceneProps): ReactElement => {
-  const scrollRef = useRef([0, 0]);
-  const prevMouseCoords = useRef([0, 0]);
-  const elementCenterPos = useRef([0, 0]);
   const elementRef = useRef<HTMLDivElement>(null);
   const cubeProps = useMemo(
-    () => cubeSizeCalculator(props.containerSize, 'desktop'),
-    [props.containerSize]
+    () =>
+      cubeSizeCalculator(
+        props.containerSize,
+        props.isMobile ? 'mobile' : 'desktop'
+      ),
+    [props.containerSize, props.isMobile]
   );
 
-  const [isActive, setIsActive] = useState<boolean | null>(null);
-
-  const [spring, api] = useSpring(
+  const [spring, api] = useSpring<ParallaxSceneSrpingProps>(
     {
       rotateX: 0,
       rotateY: 0,
-      backgroundColor: isActive
-        ? 'rgba(250, 204, 21,0.9)'
-        : 'rgba(250, 204, 21,0.1)',
-      scale: isActive ? 1.3 : 1,
-      borderRadius: isActive ? '5px' : '50%',
+      rotate: '0deg',
+      // backgroundColor: isActive
+      //   ? 'rgba(250, 204, 21,0.9)'
+      //   : 'rgba(250, 204, 21,0.1)',
+      // backgroundColor: 'rgba(250,204,21,0.9)',
+      // scale: isActive ? 1.2 : 0.9,
+      scale: 1,
+      // borderRadius: isActive ? '1%' : '50%',
+      // borderRadius: '50%',
       config: { ...springConfig.wobbly, clamp: true },
+      opacity: 0.1,
     },
-    [isActive]
+    []
   );
 
-  const handleMouseMove = useCallback((event: MouseEvent) => {
-    prevMouseCoords.current = [event.pageX, event.pageY];
-    const [rotateX, rotateY] = parallax(
-      event.pageX,
-      event.pageY,
-      elementCenterPos.current[0],
-      elementCenterPos.current[1],
-      45
-    );
+  const setActive = useCallback(() => {
     api.start({
-      rotateX,
-      rotateY,
+      // backgroundColor: 'rgba(250,204,21,0.9)',
+      scale: 1.3,
+      rotate: '22.5deg',
+      // borderRadius: '5px',
+      opacity: 0.9,
     });
   }, []);
 
-  const handleScroll = useCallback(() => {
-    const scrollX = window.scrollX - scrollRef.current[0];
-    const scrollY = window.scrollY - scrollRef.current[1];
-    prevMouseCoords.current = [
-      scrollX + prevMouseCoords.current[0],
-      scrollY + prevMouseCoords.current[1],
-    ];
-    const [rotateX, rotateY] = parallax(
-      prevMouseCoords.current[0],
-      prevMouseCoords.current[1],
-      elementCenterPos.current[0],
-      elementCenterPos.current[1],
-      45
-    );
-    scrollRef.current = [window.scrollX, window.scrollY];
+  const setInactive = useCallback(() => {
     api.start({
-      rotateX,
-      rotateY,
+      // backgroundColor: 'rgba(250,204,21,0.1)',
+      scale: 1,
+      rotate: '0deg',
+      // borderRadius: '50%',
+      opacity: 0.1,
     });
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (elementRef.current) {
-        const { left, top } = elementRef.current.getBoundingClientRect();
-        elementCenterPos.current = [
-          left + window.scrollX + cubeProps.containerSize / 2,
-          top + window.scrollY + cubeProps.containerSize / 2,
-        ];
-        scrollRef.current = [window.scrollX, window.scrollY];
-      }
-      prevMouseCoords.current = [
-        elementCenterPos.current[0],
-        elementCenterPos.current[1],
-      ];
-
-      const [rotateX, rotateY] = parallax(
-        prevMouseCoords.current[0],
-        prevMouseCoords.current[1],
-        elementCenterPos.current[0],
-        elementCenterPos.current[1],
-        45
-      );
-      api.start({
-        rotateX,
-        rotateY,
-      });
-    }, 300);
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const handleOver = useCallback(() => {
-    props.onMouseOverHandler && props.onMouseOverHandler();
-    setIsActive(true);
-  }, []);
-
-  const handleOverOut = useCallback(() => {
-    props.onMouseOutHandler && props.onMouseOutHandler();
-    setIsActive(false);
-  }, []);
-
-  const handleClick = useCallback((event: SyntheticEvent<HTMLElement>) => {
-    props.onClickHandler(event);
-  }, []);
+  const propsToPass: ParallaxSceneContainerProps = useMemo(
+    () => ({
+      ...props,
+      invertedBass,
+      // handleClick,
+      // handleOver,
+      // handleOverOut,
+      // isActive,
+      // setIsActive,
+      setActive,
+      setInactive,
+      cubeProps,
+      spring,
+      api,
+      elementRef,
+    }),
+    []
+  );
 
   return (
-    <animated.div
-      ref={elementRef}
-      className="relative flex justify-center items-center"
-      style={{
-        width: cubeProps.containerSize,
-        height: cubeProps.containerSize,
-        scale: props.springRef.bassGain.to([0, 1], [0.9, 1]),
-      }}
-    >
-      <animated.div
-        className="
-        relative
-        [&>div]:absolute 
-        [&>div]:w-full 
-        [&>div]:h-full 
-        [&>div]:opacity-80 
-        [&>div]:border 
-        [&>div]:border-cyan-600
-        [&>div]:rounded-md
-        [&>div]:bg-cyan-900"
-        style={{
-          width: `${cubeProps.originalSize}px`,
-          height: `${cubeProps.originalSize}px`,
-          transformStyle: 'preserve-3d',
-          perspective: PERSPECTIVE,
-          rotateX: spring.rotateX,
-          rotateY: spring.rotateY,
-          translate3d: ['0%', '0%', DISTANCE],
-          scale: spring.scale,
-        }}
-      >
-        <animated.div
-          onMouseOver={handleOver}
-          onMouseOut={handleOverOut}
-          onClick={handleClick}
-          className="flex justify-center
-          items-center
-          text
-          font-bold
-          border-none
-          text-zinc-400
-          cursor-pointer
-          select-none
-          "
-          style={{
-            translateZ: props.springRef.trebleGain.to(
-              [0, 1],
-              [
-                cubeProps.springGainInterpolationSize.start,
-                cubeProps.springGainInterpolationSize.end,
-              ]
-            ),
-            // scale: 0.85,
-            scale: !invertedBass ? props.springRef.bassGain.to([0, 1], cubeProps.bassScale) : cubeProps.bassScale[1], 
-            fontSize: cubeProps.textSize,
-            // backgroundColor: spring.backgroundColor,
-            // outlineWidth: props.springRef.bassGain.to(
-            //   [0, 1],
-            //   [cubeProps.outLineRingWidth / 2, cubeProps.outLineRingWidth * 1.2]
-            // ),
-            // outlineColor: themeColors.neonTheme.outlineFinal,
-            opacity: props.springRef.bassGain.to([0, 1], !invertedBass ? cubeProps.bassOpacity : cubeProps.bassOpacity.reverse()),
-            borderRadius: spring.borderRadius,
-
-            textShadow:
-              '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
-            willChange: 'transform, opacity',
-          }}
-        ></animated.div>
-        <animated.div
-          className="absolute flex justify-center items-center font-bold text-zinc-400 pointer-events-none border-none"
-          style={{
-            translateZ: props.springRef.trebleGain.to(
-              [0, 1],
-              [
-                cubeProps.springGainInterpolationSize.start,
-                cubeProps.springGainInterpolationSize.end,
-              ]
-            ),
-            // scale: props.springRef.bassGain.to([0,1],[0.7,0.8]),
-            scale: !invertedBass ? 0.8 : props.springRef.bassGain.to([0,1],cubeProps.bassScale),
-            borderRadius: spring.borderRadius,
-            fontSize: cubeProps.textSize,
-            backgroundColor: spring.backgroundColor,
-            // outlineWidth: cubeProps.outLineRingWidth / 2,
-            // outlineColor: 'transparent',
-            textShadow:
-              '-1px -1px 0 rgb(23,23,23),  1px -1px 0 rgb(23,23,23),-1px 1px 0 rgb(23,23,23),1px 1px 0 rgb(23,23,23)',
-            willChange: 'transform',
-          }}
-        >
+    <div ref={elementRef}>
+      {!props.isMobile ? (
+        <ParallaxSceneDesktop {...propsToPass}>
           {props.children}
-        </animated.div>
-        <div
-          className="border-none"
-          style={{
-            transform: `translateZ(${cubeProps.ringContainerDistance}px)`,
-            background:
-              'radial-gradient(circle, rgb(165 243 252), rgb(22 78 99))',
-          }}
-        ></div>
-        <div
-          style={{
-            transform: `translateZ(-${cubeProps.translateZSize}px)`,
-          }}
-        ></div>
-        <div
-          style={{
-            transform: `rotateY(90deg) translateZ(${cubeProps.translateZSize}px)`,
-          }}
-        ></div>
-        <div
-          style={{
-            transform: `rotateY(-90deg) translateZ(${cubeProps.translateZSize}px)`,
-          }}
-        ></div>
-        <div
-          style={{
-            transform: `rotateX(90deg) translateZ(${cubeProps.translateZSize}px)`,
-          }}
-        ></div>
-        <div
-          style={{
-            transform: `rotateX(-90deg) translateZ(${cubeProps.translateZSize}px)`,
-          }}
-        ></div>
-      </animated.div>
-    </animated.div>
+        </ParallaxSceneDesktop>
+      ) : (
+        <ParallaxSceneMobile {...propsToPass}>
+          {props.children}
+        </ParallaxSceneMobile>
+      )}
+    </div>
   );
 };
 
